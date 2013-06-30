@@ -1,5 +1,5 @@
-#ifndef _PARSER_LEXER_H_
-#define _PARSER_LEXER_H_
+#ifndef _PARSER_LEXER_HPP_
+#define _PARSER_LEXER_HPP_
 
 #include <string>
 #include <vector>
@@ -105,4 +105,4 @@ namespace sphingid
   }
 }
 
-#endif /* _PARSER_LEXER_H_ */
+#endif /* _PARSER_LEXER_HPP_ */

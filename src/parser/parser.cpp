@@ -144,6 +144,7 @@ namespace sphingid
       {
         while (((Rule*)this)->match(lexer)) {
           result.push_back(p_->parse(lexer));
+          std::cout << result.back()->str() << std::endl;
         }
         return ;
       }
@@ -292,10 +293,8 @@ namespace sphingid
       int match(Lexer* lexer, int nth)
       {
         const Token* t = lexer->peek(nth);
-        if (t->isIdToken()) {
-          if (t->str() == s_) {
-            return 1;
-          }
+        if (t->isIdToken() && t->str() == s_) {
+          return 1;
         }
         return 0;
       }
@@ -319,6 +318,7 @@ namespace sphingid
       void parse(Lexer* lexer, std::vector<ast::Node*>& result)
       {
         lexer->pop();
+        return ;
       }
     };
 
@@ -340,10 +340,11 @@ namespace sphingid
     Parser::Parser() {}
 
     Parser::Parser(MakeNodeFunc f) : makeNodeFunc_(f) {}
+    // Parser::Parser(MakeNodeFunc f, std::string name) : makeNodeFunc_(f), name_(name) {}
 
     Parser::~Parser()
     {
-      each (i, rs_) delete (*i);
+      each (i, rs_) if (*i) delete (*i);
     }
 
     int Parser::match(Lexer* lexer)
@@ -372,6 +373,9 @@ namespace sphingid
     {
       std::vector<ast::Node*> result;
       each (i, rs_) (*i)->parse(lexer, result);
+      assert(makeNodeFunc_ == ast::Node::make ||
+             makeNodeFunc_ == ast::BinaryOpNode::make ||
+             makeNodeFunc_ == ast::Node::make);
       return (makeNodeFunc_)(result);
     }
 

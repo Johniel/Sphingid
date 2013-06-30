@@ -9,7 +9,7 @@ all: $(OBJS)
 clean:
 	rm ./target/*
 
-run: all
+run:
 	./target/a.out < ./test/input
 
 ./target/parser.o: ./src/parser/parser.cpp ./src/parser/parser.hpp

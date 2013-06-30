@@ -222,9 +222,9 @@ namespace sphingid
       Token* token;
       while (true) {
         token = (Token*)lexer.front();
-        if (token == NULL) break;
+        if (token == lexer.EOF_) break;
         lexer.pop();
-        std::cout << token->str() << std::endl;
+        std::cout << token->str() << ' ' << std::flush;
       }
       return 0;
     }

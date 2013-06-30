@@ -1,5 +1,5 @@
-#ifndef _PERSER_PARSER_H_
-#define _PERSER_PARSER_H_
+#ifndef _PERSER_PARSER_HPP_
+#define _PERSER_PARSER_HPP_
 
 #include <string>
 #include <vector>
@@ -23,8 +23,13 @@ namespace sphingid
       virtual ~Parser();
 
       template<class T = ast::Node>
-      static Parser* rule(){
-        return new Parser(T::make);
+      static Parser* rule(std::string name = "{anonymous}")
+      // static Parser* rule()
+      {
+        // return new Parser(T::make, name);
+        Parser* parser = new Parser(T::make);
+        parser->name_ = name;
+        return parser;
       }
 
       ast::Node* parse(Lexer*);
@@ -44,12 +49,14 @@ namespace sphingid
       Parser* str(void);
       Parser* id(std::set<std::string>);
     private:
-      Parser(MakeNodeFunc f);
+      Parser(MakeNodeFunc);
+      // Parser(MakeNodeFunc, std::string);
       MakeNodeFunc makeNodeFunc_;
+      std::string name_;
       std::vector<Rule*> rs_;
       std::map<Token*, int> memo_;
     };
   }
 }
 
-#endif /* _PERSER_PARSER_H_ */
+#endif /* _PERSER_PARSER_HPP_ */

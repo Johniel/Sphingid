@@ -1,5 +1,5 @@
-#ifndef _AST_AST_H_
-#define _AST_AST_H_
+#ifndef _AST_AST_HPP_
+#define _AST_AST_HPP_
 
 #include <string>
 #include <vector>
@@ -31,7 +31,11 @@ namespace sphingid
       Node() {}
       virtual ~Node() {}
       virtual std::string str(void) = 0;
-      static Node* make_(std::vector<Node*> v) { return v[0]; }
+      static Node* make_(std::vector<Node*> v)
+      {
+        if (v.empty()) return (Node*)NULL;
+        return v[0];
+      }
     };
 
 //------------------------------------------------------------------------------
@@ -66,7 +70,12 @@ namespace sphingid
       std::string str(void);
       static Node* make_(std::vector<Node*> v)
       {
-        assert((int)v.size() == 3);
+        assert((int)v.size() == 3 && "Binary Oporator");
+
+        std::cout << v[0]->str() << std::endl;
+        std::cout << v[1]->str() << std::endl;
+        std::cout << v[2]->str() << std::endl;
+
         return new BinaryOpNode(v[1]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
       }
     protected:
@@ -102,4 +111,4 @@ namespace sphingid
   }
 }
 
-#endif /* _AST_AST_H_ */
+#endif /* _AST_AST_HPP_ */

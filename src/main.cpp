@@ -8,28 +8,28 @@ using namespace sphingid::ast;
 
 void arithmetic(void)
 {
-  Parser* expr = Parser::rule();
-  Parser* fact = Parser::rule();
-  Parser* term = Parser::rule();
+  Parser* expr = Parser::rule("<EXPR>");
+  Parser* fact = Parser::rule("<FACT>");
+  Parser* term = Parser::rule("<TERM>");
+  Parser* program = Parser::rule<RootNode>("<PROGRAM>");
 
-  expr->oneOf(Parser::rule()->nonTerm(term),
-              Parser::rule<BinaryOpNode>()->nonTerm(term)->cons("+")->nonTerm(term),
-              Parser::rule<BinaryOpNode>()->nonTerm(term)->cons("-")->nonTerm(term));
+  expr->oneOf(Parser::rule("{EXPR->TERM}")->nonTerm(term),
+              Parser::rule<BinaryOpNode>("<ADD>")->nonTerm(term)->cons("+")->nonTerm(term),
+              Parser::rule<BinaryOpNode>("<SUB>")->nonTerm(term)->cons("-")->nonTerm(term));
 
-  term->oneOf(Parser::rule()->nonTerm(fact),
-              Parser::rule<BinaryOpNode>()->nonTerm(fact)->cons("*")->nonTerm(fact),
-              Parser::rule<BinaryOpNode>()->nonTerm(fact)->cons("/")->nonTerm(fact),
-              Parser::rule<BinaryOpNode>()->nonTerm(fact)->cons("%")->nonTerm(fact));
+  term->oneOf(Parser::rule("{TERM->FACT}")->nonTerm(fact),
+              Parser::rule<BinaryOpNode>("<MUL>")->nonTerm(fact)->cons("*")->nonTerm(fact),
+              Parser::rule<BinaryOpNode>("<DIV>")->nonTerm(fact)->cons("/")->nonTerm(fact),
+              Parser::rule<BinaryOpNode>("<MOD>")->nonTerm(fact)->cons("%")->nonTerm(fact));
 
-  fact->oneOf(Parser::rule()->cons("(")->nonTerm(expr)->cons(")"),
-              Parser::rule()->num());
+  fact->oneOf(Parser::rule("<BRACKET>")->skip("(")->nonTerm(expr)->skip(")"),
+              Parser::rule("<NUM>")->num());
+
+  program->repeat(Parser::rule("<BLOCK>")->nonTerm(expr)->skip(";"));
 
   Lexer* lexer = new Lexer();
-  while (lexer->hasNext()) {
-    cout << "front: " << lexer->front()->str() << endl;
-    Node* root = expr->parse(lexer);
-    cout << root->str() << endl;
-  }
+  Node* root = program->parse(lexer);
+  cout << ">> " << root->str() << endl;
 
   return ;
 }
