@@ -13,25 +13,14 @@ namespace sphingid
 {
   namespace ast
   {
-    class Node;
-
-    template<class NodeClass>
-    class StaticMakable {
-    public:
-      static Node* make(std::vector<Node*> v)
-      {
-        return NodeClass::make_(v);
-      }
-    };
-
 //------------------------------------------------------------------------------
-    class Node : public StaticMakable<Node>
+    class Node
     {
     public:
       Node() {}
       virtual ~Node() {}
       virtual std::string str(void) = 0;
-      static Node* make_(std::vector<Node*> v)
+      static Node* make(std::vector<Node*> v)
       {
         if (v.empty()) return (Node*)NULL;
         return v[0];
@@ -68,14 +57,9 @@ namespace sphingid
       virtual ~BinaryOpNode();
       int allocSize(void);
       std::string str(void);
-      static Node* make_(std::vector<Node*> v)
+      static Node* make(std::vector<Node*> v)
       {
         assert((int)v.size() == 3 && "Binary Oporator");
-
-        std::cout << v[0]->str() << std::endl;
-        std::cout << v[1]->str() << std::endl;
-        std::cout << v[2]->str() << std::endl;
-
         return new BinaryOpNode(v[1]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
       }
     protected:

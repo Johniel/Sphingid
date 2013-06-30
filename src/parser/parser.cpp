@@ -144,7 +144,6 @@ namespace sphingid
       {
         while (((Rule*)this)->match(lexer)) {
           result.push_back(p_->parse(lexer));
-          std::cout << result.back()->str() << std::endl;
         }
         return ;
       }
@@ -365,7 +364,6 @@ namespace sphingid
         if (m == 0) return memo_[(Token*)front] = 0;
         curr += m;
       }
-
       return memo_[(Token*)front] = curr - nth;
     }
 
@@ -373,9 +371,6 @@ namespace sphingid
     {
       std::vector<ast::Node*> result;
       each (i, rs_) (*i)->parse(lexer, result);
-      assert(makeNodeFunc_ == ast::Node::make ||
-             makeNodeFunc_ == ast::BinaryOpNode::make ||
-             makeNodeFunc_ == ast::Node::make);
       return (makeNodeFunc_)(result);
     }
 
