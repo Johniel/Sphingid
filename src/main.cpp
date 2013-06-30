@@ -29,7 +29,7 @@ void arithmetic(void)
 
   Lexer* lexer = new Lexer();
   Node* root = program->parse(lexer);
-  cout << ">> " << root->str() << endl;
+  cout << root->str() << endl;
 
   return ;
 }

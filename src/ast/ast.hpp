@@ -34,6 +34,10 @@ namespace sphingid
       RootNode(std::vector<Node*>);
       virtual ~RootNode();
       std::string str(void);
+      static Node* make(std::vector<Node*> v)
+      {
+        return new RootNode(v);
+      }
     private:
       std::vector<Node*> next_;
     };
