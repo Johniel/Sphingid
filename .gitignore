@@ -1,3 +1,10 @@
 /.idea/code.sp
 /README.md~
 /.idea/token
+/.idea/memo.md
+/target/a.out
+/target/ast.o
+/target/lexer.o
+/target/main.o
+/target/parser.o
+/test/add

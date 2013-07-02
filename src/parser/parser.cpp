@@ -419,7 +419,8 @@ namespace sphingid
       return this;
     }
 
-    Parser* Parser::id(std::set<std::string> reserved = std::set<std::string>())
+    // Parser* Parser::id(std::set<std::string> reserved = std::set<std::string>())
+    Parser* Parser::id(std::set<std::string> reserved)
     {
       rs_.push_back(new IdToken(reserved));
       return this;
