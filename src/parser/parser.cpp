@@ -322,14 +322,49 @@ namespace sphingid
     };
 
 //------------------------------------------------------------------------------
-// class Operator
+// class BinaryOperatorR
 //
 //------------------------------------------------------------------------------
 
+    class BinaryOpNodeR : public ast::BinaryOpNode {
+    public:
+      static ast::Node* make(std::vector<ast::Node*> v)
+      {
+        assert(false);
+        return NULL;
+      }
+    };
+
 //------------------------------------------------------------------------------
-// class BinaryExp
+// class BinaryOperatorL
 //
 //------------------------------------------------------------------------------
+
+    class BinaryOpNodeL : public ast::BinaryOpNode {
+    public:
+      static Node* make(std::vector<Node*> v)
+      {
+        std::vector<ast::Node*> u;
+        std::vector<ast::Node*> w;
+        ast::ExpNode* head = (ExpNode*)v[0];
+        ast::ArrayNode* curr = (ast::ArrayNode*)v[1];
+
+        while (true) {
+          u.push_back(curr->nth(0));
+          w.push_back(curr->nth(1));
+          if (curr->size() < 3) break;
+          curr = (ast::ArrayNode*)curr->nth(2);
+        }
+
+        BinaryOpNode* result;
+        const size_t nest = u.size();
+        for (size_t i = 0; i < nest; ++i) {
+          if (i) result = new BinaryOpNode(u[i]->str(), result, (ExpNode*)w[i]);
+          else result = new BinaryOpNode(u[i]->str(), head, (ExpNode*)w[i]);
+        }
+        return result;
+      }
+    };
 
 //------------------------------------------------------------------------------
 // class Parser
@@ -423,6 +458,22 @@ namespace sphingid
     Parser* Parser::id(std::set<std::string> reserved)
     {
       rs_.push_back(new IdToken(reserved));
+      return this;
+    }
+
+    Parser* Parser::operatorR(Parser* l, Parser* op, Parser* r)
+    {
+      Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
+      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(rule<ast::ArrayNode>()->nonTerm(l)->repeat(rest));
+      this->nonTerm(parser);
+      return this;
+    }
+
+    Parser* Parser::operatorL(Parser* l, Parser* op, Parser* r)
+    {
+      Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
+      Parser* parser = rule<BinaryOpNodeL>()->nonTerm(l)->repeat(rest);
+      this->nonTerm(parser);
       return this;
     }
   }

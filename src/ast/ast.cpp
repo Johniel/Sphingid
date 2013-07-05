@@ -1,6 +1,5 @@
 #include "ast.hpp"
 
-
 namespace sphingid
 {
   namespace ast
@@ -132,6 +131,28 @@ namespace sphingid
     std::string TermSymbolNode::str(void)
     {
       return s_;
+    }
+
+//------------------------------------------------------------------------------
+// class ArrayNode
+//
+//------------------------------------------------------------------------------
+    ArrayNode::ArrayNode() {}
+
+    ArrayNode::ArrayNode(std::vector<Node*> v) : array_(v) {}
+
+    ArrayNode::~ArrayNode() {}
+
+    std::string ArrayNode::str(void)
+    {
+      std::string s;
+      each(i, array_) s += (*i)->str();
+      return s;
+    }
+
+    Node* ArrayNode::operator [] (int idx)
+    {
+      return array_[idx];
     }
 
   }
