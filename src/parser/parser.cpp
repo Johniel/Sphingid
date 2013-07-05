@@ -347,20 +347,17 @@ namespace sphingid
         std::vector<ast::Node*> u;
         std::vector<ast::Node*> w;
         ast::ExpNode* head = (ExpNode*)v[0];
-        ast::ArrayNode* curr = (ast::ArrayNode*)v[1];
 
-        while (true) {
+        for (size_t i = 1; i < v.size(); ++i) {
+          ast::ArrayNode* curr = (ast::ArrayNode*)v[i];
           u.push_back(curr->nth(0));
           w.push_back(curr->nth(1));
-          if (curr->size() < 3) break;
-          curr = (ast::ArrayNode*)curr->nth(2);
         }
 
-        BinaryOpNode* result;
+        BinaryOpNode* result = new BinaryOpNode(u[0]->str(), head, (ExpNode*)w[0]);
         const size_t nest = u.size();
-        for (size_t i = 0; i < nest; ++i) {
-          if (i) result = new BinaryOpNode(u[i]->str(), result, (ExpNode*)w[i]);
-          else result = new BinaryOpNode(u[i]->str(), head, (ExpNode*)w[i]);
+        for (size_t i = 1; i < nest; ++i) {
+          result = new BinaryOpNode(u[i]->str(), result, (ExpNode*)w[i]);
         }
         return result;
       }
@@ -464,7 +461,7 @@ namespace sphingid
     Parser* Parser::operatorR(Parser* l, Parser* op, Parser* r)
     {
       Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
-      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(rule<ast::ArrayNode>()->nonTerm(l)->repeat(rest));
+      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(l)->repeat(rest);
       this->nonTerm(parser);
       return this;
     }
