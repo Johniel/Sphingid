@@ -21,14 +21,14 @@ void arithmetic(void)
                                           Parser::rule()->cons("-"));
 
   expr->oneOf(Parser::rule()->operatorL(term, expr_op, term),
-              Parser::rule()->nonTerm(term));
+              term);
 
   Parser* term_op = Parser::rule()->oneOf(Parser::rule()->cons("*"),
                                           Parser::rule()->cons("/"),
                                           Parser::rule()->cons("%"));
 
   term->oneOf(Parser::rule()->operatorL(fact, term_op, fact),
-              Parser::rule()->nonTerm(fact));
+              fact);
 
   fact->oneOf(Parser::rule("<BRACKET>")->skip("(")->nonTerm(expr)->skip(")"),
               Parser::rule("<NUM>")->num());
@@ -45,7 +45,6 @@ void arithmetic(void)
 void add_op()
 {
   Parser* add = Parser::rule<BinaryOpNode>("<ADD>")->num()->cons("+")->num();
-
   Lexer* lexer = new Lexer();
   Node* root = add->parse(lexer);
 
@@ -58,45 +57,44 @@ void sphingid_syntax()
 {
   Parser* program = Parser::rule<RootNode>();
 
-  Parser* primary_exp;
-  Parser* postfix_exp;
-  Parser* arg_list;
-  Parser* arg_type;
-  Parser* unary_op;
-  Parser* unary_exp;
-  Parser* multiplicative;
-  Parser* additive;
+  Parser* primary_exp = Parser::rule();
+  Parser* postfix_exp = Parser::rule();
+  Parser* arg_list = Parser::rule();
+  Parser* arg_type = Parser::rule();
+  Parser* unary_op = Parser::rule();
+  Parser* unary_exp = Parser::rule();
+  Parser* multiplicative = Parser::rule();
+  Parser* additive = Parser::rule();
   // Parser* shift;
-  Parser* relational;
-  Parser* equality;
-  Parser* bitwise_and;
-  Parser* bitwise_or;
-  Parser* logical_and;
-  Parser* logical_or;
-  Parser* exclusive_or;
-  Parser* inclusive_or;
-  Parser* conditional;
-  Parser* assignment;
-  Parser* exp;
-  Parser* const_exp;
+  Parser* relational = Parser::rule();
+  Parser* equality = Parser::rule();
+  Parser* bitwise_and = Parser::rule();
+  Parser* bitwise_or = Parser::rule();
+  Parser* logical_and = Parser::rule();
+  Parser* logical_or = Parser::rule();
+  Parser* exclusive_or = Parser::rule();
+  Parser* inclusive_or = Parser::rule();
+  Parser* conditional = Parser::rule();
+  Parser* assignment = Parser::rule();
+  Parser* exp = Parser::rule();
+  Parser* const_exp = Parser::rule();
 
-  Parser* keyword;
+  Parser* keyword = Parser::rule();
 
-  Parser* fn_def; // = Parser::rule<FnDefNode>();
-  Parser* fn_decl; // = Parser::rule<FnDeclNode>();
+  Parser* fn_def = Parser::rule(); // = Parser::rule<FnDefNode>();
+  Parser* fn_decl = Parser::rule<FnDeclNode>("<FnDecl>");
 
-  Parser* op_def; // = Parser::rule<OpDefNode>();
-  Parser* op_decl; // = Parser::rule<OpDeclNode>();
+  Parser* op_def = Parser::rule(); // = Parser::rule<OpDefNode>();
+  Parser* op_decl = Parser::rule(); // = Parser::rule<OpDeclNode>();
 
-  Parser* class_def; // = Parser::rule<DefClassNode>();
-  Parser* class_body; // = Parser::rule<DefClassNode>();
+  Parser* class_def = Parser::rule<ClassNode>("<ClassDef>");
 
-  Parser* struct_def; // = Parser::rule<StructDefNode>();
-  Parser* struct_body;
+  Parser* struct_def = Parser::rule(); // = Parser::rule<StructDefNode>();
+  Parser* struct_body = Parser::rule();
 
-  Parser* compound_stat;
-  Parser* selection_stat;
-  Parser* iteration_stat;
+  Parser* compound_stat = Parser::rule();
+  Parser* selection_stat = Parser::rule();
+  Parser* iteration_stat = Parser::rule();
 
   std::set<string> reserved;
   reserved.insert("=");
@@ -110,42 +108,49 @@ void sphingid_syntax()
                    Parser::rule()->cons("~")->nonTerm(unary_exp),
                    Parser::rule()->nonTerm(unary_op)->nonTerm(unary_exp));
 
-  multiplicative->oneOf(unary_exp,
-                        Parser::rule()->nonTerm(multiplicative)->cons("*")->nonTerm(unary_exp),
-                        Parser::rule()->nonTerm(multiplicative)->cons("/")->nonTerm(unary_exp),
-                        Parser::rule()->nonTerm(multiplicative)->cons("%")->nonTerm(unary_exp));
+  Parser* multiplicative_op = Parser::rule()->oneOf(Parser::rule()->cons("*"),
+                                                    Parser::rule()->cons("/"),
+                                                    Parser::rule()->cons("%"));
 
-  additive->oneOf(multiplicative,
-                  Parser::rule()->nonTerm(additive)->cons("+")->nonTerm(multiplicative),
-                  Parser::rule()->nonTerm(additive)->cons("-")->nonTerm(multiplicative));
+  multiplicative->oneOf(Parser::rule()->operatorL(unary_exp, multiplicative_op, unary_exp),
+                        unary_exp);
 
-  relational->oneOf(additive,
-                    Parser::rule()->nonTerm(relational)->cons("<")->nonTerm(additive),
-                    Parser::rule()->nonTerm(relational)->cons(">")->nonTerm(additive),
-                    Parser::rule()->nonTerm(relational)->cons("<=")->nonTerm(additive),
-                    Parser::rule()->nonTerm(relational)->cons(">=")->nonTerm(additive));
+  Parser* additive_op = Parser::rule()->oneOf(Parser::rule()->cons("+"),
+                                              Parser::rule()->cons("-"));
+  additive->oneOf(Parser::rule()->operatorL(multiplicative, additive_op, multiplicative),
+                  multiplicative);
 
-  equality->oneOf(relational,
-                  Parser::rule()->nonTerm(equality)->cons("==")->nonTerm(relational),
-                  Parser::rule()->nonTerm(equality)->cons("!=")->nonTerm(relational));
+  Parser* relational_op = Parser::rule()->oneOf(Parser::rule()->cons("<"),
+                                                Parser::rule()->cons(">"),
+                                                Parser::rule()->cons("<="),
+                                                Parser::rule()->cons(">="));
 
-  bitwise_and->oneOf(equality,
-                     Parser::rule()->nonTerm(bitwise_and)->cons("&")->nonTerm(equality));
+  relational->oneOf(Parser::rule()->operatorL(additive, relational_op, additive),
+                    additive);
 
-  exclusive_or->oneOf(bitwise_and,
-                      Parser::rule()->nonTerm(exclusive_or)->cons("^")->nonTerm(bitwise_and));
+  Parser* equality_op = Parser::rule()->oneOf(Parser::rule()->cons("=="),
+                                              Parser::rule()->cons("!="));
 
-  inclusive_or->oneOf(exclusive_or,
-                      Parser::rule()->nonTerm(inclusive_or)->cons("|")->nonTerm(exclusive_or));
+  equality->oneOf(Parser::rule()->operatorL(relational, equality_op, relational),
+                  relational);
 
-  logical_and->oneOf(inclusive_or,
-                     Parser::rule()->nonTerm(logical_and)->cons("&&")->nonTerm(inclusive_or));
+  bitwise_and->oneOf(Parser::rule()->operatorL(equality, Parser::rule()->cons("&"), equality),
+                     equality);
 
-  logical_or->oneOf(logical_and,
-                    Parser::rule()->nonTerm(logical_or)->cons("||")->nonTerm(logical_and));
+  exclusive_or->oneOf(Parser::rule()->operatorL(bitwise_and, Parser::rule()->cons("^"), bitwise_and),
+                      bitwise_and);
 
-  conditional->oneOf(logical_or,
-                     Parser::rule()->nonTerm(logical_or)->skip("?")->nonTerm(exp)->skip(":")->nonTerm(conditional));
+  inclusive_or->oneOf(Parser::rule()->operatorL(exclusive_or, Parser::rule()->cons("|"), exclusive_or),
+                      exclusive_or);
+
+  logical_and->oneOf(Parser::rule()->operatorL(inclusive_or, Parser::rule()->cons("&&"), inclusive_or),
+                     inclusive_or);
+
+  logical_or->oneOf(Parser::rule()->operatorL(logical_and, Parser::rule()->cons("||"), logical_and),
+                    logical_and);
+
+  conditional->oneOf(Parser::rule()->nonTerm(logical_or)->skip("?")->nonTerm(exp)->skip(":")->nonTerm(conditional),
+                     logical_or);
 
   assignment->oneOf(conditional,
                     Parser::rule()->nonTerm(unary_exp)->cons("=")->nonTerm(assignment),
@@ -158,27 +163,31 @@ void sphingid_syntax()
                     Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
 
+  arg_list->repeat(Parser::rule()->id()->id(reserved)->skip(","))->id();
+  arg_type->oneOf(Parser::rule<ArrayNode>()->repeat(Parser::rule()->id()->skip(","))->id(),
+                  Parser::rule<ArrayNode>()->id());
 
+  op_def->id(reserved)->skip("operator")->id()->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
 
-             arg_list->repeat(Parser::rule()->id()->id(reserved)->skip(","))->id();
-             arg_type->repeat(Parser::rule()->id()->skip(","))->id();
+  fn_def->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_list)->skip(")")->nonTerm(compound_stat);
+  fn_decl->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
 
-             op_def->id(reserved)->skip("operator")->id()->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+  Parser* class_body = Parser::rule<ArrayNode>()->repeat(fn_decl);
+  class_def->skip("class")->id(reserved)->skip("{")->nonTerm(class_body)->skip("}")->skip(";");
 
-             fn_def->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_list)->skip(")")->nonTerm(compound_stat);
-             fn_decl->id(reserved)->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+  struct_def->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";");
 
-             class_body->repeat(fn_decl);
-             class_def->skip("class")->id(reserved)->skip("{")->nonTerm(class_body)->skip("}")->skip(";");
+  Lexer* lexer = new Lexer();
+  Node* root = class_def->parse(lexer);
+  cout << "$" << endl;
+  if (root) cout << root->str() << endl;
+  return ;
+}
 
-             struct_def->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";");
-
-             return ;
-             }
-
-    int main(int argc, char *argv[])
-  {
-    arithmetic();
-    // add_op();
-    return 0;
-  }
+int main(int argc, char *argv[])
+{
+  // arithmetic();
+  // add_op();
+  sphingid_syntax();
+  return 0;
+}

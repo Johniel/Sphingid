@@ -9,6 +9,12 @@
 #include "../parser/lexer.hpp"
 #include "../macro.hpp"
 
+#define TEST
+
+#ifdef TEST
+using namespace std;
+#endif
+
 namespace sphingid
 {
   namespace ast
@@ -22,10 +28,12 @@ namespace sphingid
       virtual std::string str(void) = 0;
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         std::cout << "Node::make" << std::endl;
         for (int i = 0; i < v.size(); ++i) {
           std::cout << "Node> " << v[i]->str() << std::endl;
         }
+#endif
         if (v.empty()) return (Node*)NULL;
         return v[0];
       }
@@ -46,6 +54,15 @@ namespace sphingid
       static Node* make(std::vector<Node*> v)
       {
         return new ArrayNode(v);
+      }
+      template<class T = Node>
+      std::vector<T*> vec()
+      {
+        std::vector<T*> v;
+        for (size_t i = 0; i < array_.size(); ++i) {
+          v.push_back((T*)array_[i]);
+        }
+        return v;
       }
     private:
       std::vector<Node*> array_;
@@ -87,10 +104,12 @@ namespace sphingid
       std::string str(void);
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         std::cout << "BinaryOpNode::make" << std::endl;
         for (int i = 0; i < v.size(); ++i) {
           std::cout << "BinaryOpNode>" << v[i]->str() << std::endl;
         }
+#endif
         if (v.size() == 2) return new BinaryOpNode(v[1]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
         if (v.size() == 3) return new BinaryOpNode(v[0]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
         assert(false && "Binary Oporator");
@@ -122,9 +141,67 @@ namespace sphingid
       TermSymbolNode(std::string);
       virtual ~TermSymbolNode();
       std::string str(void);
+      static Node* make(std::vector<Node*> v)
+      {
+#ifdef TEST
+        cout << "TermSymbolNode::make" << endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << ": " << v[i]->str() << endl;
+        }
+#endif
+        assert(v.size() == 1);
+        return new TermSymbolNode(v[0]->str());
+      }
     private:
       std::string s_;
     };
+
+//------------------------------------------------------------------------------
+    class StatNode : public Node {} ;
+
+//------------------------------------------------------------------------------
+    class FnDeclNode : public StatNode {
+    public:
+      ~FnDeclNode() ;
+      virtual std::string str() ;
+      static Node* make(std::vector<Node*> v)
+      {
+#ifdef TEST
+        std::cout << "FnDeclNode" << std::endl;
+#endif
+        return new FnDeclNode(v);
+      }
+    private:
+      FnDeclNode(std::vector<Node*>) ;
+      std::string name_;
+      TermSymbolNode* ret_;
+      std::vector<TermSymbolNode*> args_;
+    } ;
+
+//------------------------------------------------------------------------------
+    class ClassNode : public StatNode {
+    public:
+      ClassNode() ;
+      ~ClassNode() ;
+      virtual std::string str() ;
+      static Node* make(std::vector<Node*> v)
+      {
+#ifdef TEST
+        std::cout << "ClassNode:make" << std::endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << ": " << v[i]->str() << endl;
+        }
+#endif
+        return new ClassNode(v);
+      }
+    private:
+      ClassNode(std::vector<Node*>) ;
+      std::string name_;
+      std::vector<FnDeclNode*> fn_;
+    } ;
+
+//------------------------------------------------------------------------------
+    class StructNode : public StatNode {} ;
 
   }
 }

@@ -146,7 +146,7 @@ namespace sphingid
     std::string ArrayNode::str(void)
     {
       std::string s;
-      each(i, array_) s += (*i)->str();
+      each(i, array_) s += (*i)->str() + "\n";
       return s;
     }
 
@@ -154,6 +154,82 @@ namespace sphingid
     {
       return array_[idx];
     }
+
+
+//------------------------------------------------------------------------------
+// class StatNode
+//
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+// class FunDeclNode
+//
+//------------------------------------------------------------------------------
+
+    FnDeclNode::FnDeclNode(std::vector<Node*> v)
+    {
+      this->ret_  = (TermSymbolNode*)v[0];
+      this->name_ = v[1]->str();
+      this->args_ = ((ArrayNode*)v[2])->vec<TermSymbolNode>();
+    }
+
+    FnDeclNode::~FnDeclNode()
+    {
+      if (ret_)  delete ret_;
+      for (size_t i = 0; i < args_.size(); ++i) {
+        delete args_[i];
+      }
+    }
+
+    std::string FnDeclNode::str()
+    {
+      std::string s;
+      s += this->name_;
+      s += " :: ";
+      for (size_t i = 0; i < args_.size(); ++i) {
+        if (i) s += " -> ";
+        s += args_[i]->str();
+      }
+      s += " -> " + this->ret_->str();
+      return "(" + s + ")";
+    }
+
+
+//------------------------------------------------------------------------------
+// class ClassNode
+//
+//------------------------------------------------------------------------------
+
+    ClassNode::ClassNode()
+    {
+      assert(false);
+    }
+
+    ClassNode::~ClassNode()
+    {
+    }
+
+    std::string ClassNode::str()
+    {
+      std::string s;
+      s += "class ";
+      s += this->name_;
+      for (size_t i = 0; i < fn_.size(); ++i) {
+        s += "\n" + fn_[i]->str();
+      }
+      return "(" + s + ")";
+    }
+
+    ClassNode::ClassNode(std::vector<Node*> v)
+    {
+      this->name_ = v[0]->str();
+      this->fn_ = ((ArrayNode*)v[1])->vec<FnDeclNode>();
+    }
+
+//------------------------------------------------------------------------------
+// class StructNode
+//
+//------------------------------------------------------------------------------
 
   }
 }

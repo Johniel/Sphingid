@@ -10,7 +10,7 @@ clean:
 	rm ./target/*
 
 run:
-	./target/a.out < ./test/input
+	./target/a.out < ./test/sample.sp
 
 ./target/parser.o: ./src/parser/parser.cpp ./src/parser/parser.hpp
 	g++ -c ./src/parser/parser.cpp -o $@ $(OPT)

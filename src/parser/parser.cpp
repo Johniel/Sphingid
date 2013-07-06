@@ -221,6 +221,7 @@ namespace sphingid
 
       ast::Node* make(const Token* t)
       {
+        assert(!ignores_.count(t->str()));
         return new ast::TermSymbolNode(t->str());
       }
 
@@ -316,6 +317,7 @@ namespace sphingid
       virtual ~Skip() {}
       void parse(Lexer* lexer, std::vector<ast::Node*>& result)
       {
+        assert(lexer->front()->str() == this->s_);
         lexer->pop();
         return ;
       }
@@ -403,6 +405,14 @@ namespace sphingid
     {
       std::vector<ast::Node*> result;
       each (i, rs_) (*i)->parse(lexer, result);
+
+#ifdef TEST
+      cout << rs_.size() << endl;
+      for (int i = 0; i < result.size(); ++i) {
+        cout << result[i]->str() << endl;
+      }
+#endif
+
       return (makeNodeFunc_)(result);
     }
 
