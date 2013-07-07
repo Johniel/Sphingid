@@ -56,26 +56,26 @@ void add_op()
 void sphingid_syntax()
 {
   Parser* primary_exp = Parser::rule();
-  Parser* postfix_exp = Parser::rule();
+  Parser* postfix_exp = Parser::rule("<POSTFIX>");
   // Parser* arg_list = Parser::rule();
   Parser* arg_type = Parser::rule();
   Parser* unary_op = Parser::rule();
   Parser* unary_exp = Parser::rule();
-  Parser* multiplicative = Parser::rule();
-  Parser* additive = Parser::rule();
+  Parser* multiplicative = Parser::rule("<MUL>");
+  Parser* additive = Parser::rule("<ADD>");
   // Parser* shift;
-  Parser* relational = Parser::rule();
-  Parser* equality = Parser::rule();
-  Parser* bitwise_and = Parser::rule();
-  Parser* bitwise_or = Parser::rule();
-  Parser* logical_and = Parser::rule();
-  Parser* logical_or = Parser::rule();
-  Parser* exclusive_or = Parser::rule();
-  Parser* inclusive_or = Parser::rule();
-  Parser* conditional = Parser::rule();
-  Parser* assignment = Parser::rule();
-  Parser* exp = Parser::rule();
-  Parser* const_exp = Parser::rule();
+  Parser* relational = Parser::rule("<REL>");
+  Parser* equality = Parser::rule("<EQ>");
+  Parser* bitwise_and = Parser::rule("<&&>");
+  Parser* bitwise_or = Parser::rule("<||>");
+  Parser* logical_and = Parser::rule("<>");
+  Parser* logical_or = Parser::rule("<|>");
+  Parser* exclusive_or = Parser::rule("<^>");
+  Parser* inclusive_or = Parser::rule("<|>");
+  Parser* conditional = Parser::rule("<COND>");
+  Parser* assignment = Parser::rule("<ASSIGN>");
+  Parser* const_exp = Parser::rule("<CONST EXP>");
+  Parser* exp = Parser::rule("<EXP>");
 
   Parser* keyword = Parser::rule();
 
@@ -89,7 +89,8 @@ void sphingid_syntax()
 
   Parser* struct_def = Parser::rule<StructNode>();
 
-  Parser* compound_stat = Parser::rule()->skip("{")->cons(";")->skip("}");
+  Parser* compound_stat = Parser::rule();
+  Parser* exp_stat = Parser::rule();
   Parser* selection_stat = Parser::rule();
   Parser* iteration_stat = Parser::rule();
 
@@ -103,6 +104,19 @@ void sphingid_syntax()
                                        Parser::rule()->cons("int"),
                                        Parser::rule()->cons("keyword"),
                                        Parser::rule()->cons("string"));
+
+  keyword->skip(":")->id(reserved);
+
+  primary_exp->oneOf(Parser::rule()->id(),
+                     Parser::rule()->num(),
+                     Parser::rule()->str(),
+                     Parser::rule()->skip("(")->nonTerm(exp)->skip(")"),
+                     Parser::rule()->nonTerm(keyword));
+
+  postfix_exp->oneOf(primary_exp,
+                     // Parser::rule()->nonTerm(postfix_exp)->skip("[")->nonTerm(expression)->skip("]"),
+                     Parser::rule()->nonTerm(postfix_exp)->skip("(")->skip(")"),
+                     Parser::rule()->nonTerm(postfix_exp)->skip("(")->rep(Parser::rule()->id())->skip(")"));
 
   unary_exp->oneOf(postfix_exp,
                    Parser::rule()->cons("++")->nonTerm(unary_exp),
@@ -167,6 +181,10 @@ void sphingid_syntax()
                     Parser::rule()->nonTerm(unary_exp)->cons("&=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
+
+  exp->nonTerm(assignment);
+  exp_stat->nonTerm(exp)->skip(";");
+  compound_stat->skip("{")->rep(exp_stat)->skip("}");
 
   Parser* arg = Parser::rule<ArrayNode>()->id(reserved)->id();
   Parser* arg_list = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->cons("void"),

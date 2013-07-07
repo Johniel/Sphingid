@@ -94,6 +94,20 @@ namespace sphingid
     }
 
 //------------------------------------------------------------------------------
+// class StrLiteralNode
+//
+//------------------------------------------------------------------------------
+
+    StrLiteralNode::StrLiteralNode(std::string s) : s_(s) {}
+    StrLiteralNode::~StrLiteralNode() {}
+    bool StrLiteralNode::isAssignable(void) { assert(false); }
+    bool StrLiteralNode::isConst(void) { assert(false); }
+    bool StrLiteralNode::isLvalue(void) { assert(false); }
+    int StrLiteralNode::allocSize(void) { assert(false); }
+    std::string StrLiteralNode::str(void) { return s_; }
+
+
+//------------------------------------------------------------------------------
 // class BinaryOpNode
 //
 //------------------------------------------------------------------------------
@@ -207,6 +221,7 @@ namespace sphingid
       for (size_t i = 0; i < args.size(); ++i) {
         this->args_.push_back(make_pair((TermSymbolNode*)args[i]->nth(0), args[i]->nth(1)->str()));
       }
+      this->body_ = (RootNode*)v[3];
     }
 
     FnDefNode::~FnDefNode()
@@ -227,6 +242,8 @@ namespace sphingid
         s += args_[i].first->str() + "(" + args_[i].second + ")";
       }
       s += " -> " + this->ret_->str();
+      s += "\n";
+      s += this->body_->str();
       return "(" + s + ")";
     }
 

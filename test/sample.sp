@@ -8,5 +8,9 @@ struct StructName {
   string s;
 };
 
-int main(int argc){ ; }
-int main(int argc, string args){ ; }
+int main(int argc, string args)
+{
+  1 + 2;
+  "string literal";
+  1 + 2 * 3 / 4 % 5 + 6 - 7;
+}

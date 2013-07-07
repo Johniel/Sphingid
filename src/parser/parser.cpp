@@ -263,8 +263,7 @@ namespace sphingid
       }
       ast::Node* make(const Token* t)
       {
-        assert(false);
-        return NULL;
+        return new ast::StrLiteralNode(t->str());
       }
     };
 
@@ -387,7 +386,11 @@ namespace sphingid
 
     int Parser::match(Lexer* lexer, int nth)
     {
-      assert(rs_.size());
+      // assert(rs_.size());
+      if (rs_.empty()) {
+        cerr << "[" << this->name_ << "] " << "empty parse rule" << endl;
+        assert(false);
+      }
 
       const Token* front = lexer->peek(nth);
       if (memo_.count((Token*)front)) return memo_[(Token*)front];

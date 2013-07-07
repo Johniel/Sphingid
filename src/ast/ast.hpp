@@ -140,6 +140,21 @@ namespace sphingid
     };
 
 //------------------------------------------------------------------------------
+    class StrLiteralNode : public ExpNode
+    {
+    public:
+      StrLiteralNode(std::string);
+      virtual ~StrLiteralNode();
+      bool isAssignable(void);
+      bool isConst(void);
+      bool isLvalue(void);
+      int allocSize(void);
+      std::string str(void);
+    private:
+      std::string s_;
+    };
+
+//------------------------------------------------------------------------------
     class TermSymbolNode : public Node {
     public:
       TermSymbolNode(std::string);
@@ -184,6 +199,7 @@ namespace sphingid
       std::string name_;
       TermSymbolNode* ret_;
       std::vector< pair<TermSymbolNode*, string> > args_;
+      RootNode* body_;
     };
 
 //------------------------------------------------------------------------------
