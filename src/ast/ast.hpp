@@ -53,6 +53,10 @@ namespace sphingid
       size_t size(void) { return array_.size(); }
       static Node* make(std::vector<Node*> v)
       {
+        cout << "ArrayNode::make" << endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << v[i]->str() << endl;
+        }
         return new ArrayNode(v);
       }
       template<class T = Node>
@@ -160,6 +164,29 @@ namespace sphingid
     class StatNode : public Node {} ;
 
 //------------------------------------------------------------------------------
+    class FnDefNode : public StatNode {
+    public:
+      ~FnDefNode() ;
+      virtual std::string str() ;
+      static Node* make(std::vector<Node*> v)
+      {
+#ifdef TEST
+        std::cout << "FnDefNode::make" << std::endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << ": " << v[i]->str() << endl;
+        }
+#endif
+        assert(v.size() == 4); // return_type, fn_name, arg_list, body
+        return new FnDefNode(v);
+      }
+    private:
+      FnDefNode(std::vector<Node*>) ;
+      std::string name_;
+      TermSymbolNode* ret_;
+      std::vector< pair<TermSymbolNode*, string> > args_;
+    };
+
+//------------------------------------------------------------------------------
     class FnDeclNode : public StatNode {
     public:
       ~FnDeclNode() ;
@@ -201,7 +228,27 @@ namespace sphingid
     } ;
 
 //------------------------------------------------------------------------------
-    class StructNode : public StatNode {} ;
+    class StructNode : public StatNode {
+    public:
+      StructNode() ;
+      ~StructNode() ;
+      virtual std::string str() ;
+      static Node* make(std::vector<Node*> v)
+      {
+#ifdef TEST
+        std::cout << "StructNode:make" << std::endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << ": " << v[i]->str() << endl;
+        }
+#endif
+        return new StructNode(v);
+      }
+    private:
+      StructNode(std::vector<Node*>) ;
+      std::string name_;
+      std::vector< std::pair<std::string, std::string> > fn_;
+
+    } ;
 
   }
 }

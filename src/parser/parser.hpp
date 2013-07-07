@@ -43,7 +43,8 @@ namespace sphingid
       Parser* cons(std::string);
       Parser* skip(std::string);
       Parser* option(Parser*);
-      Parser* repeat(Parser*);
+      Parser* rep(Parser*);
+      Parser* opt(Parser*);
       Parser* nonTerm(Parser*);
       Parser* num(void);
       Parser* str(void);

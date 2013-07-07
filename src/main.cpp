@@ -33,7 +33,7 @@ void arithmetic(void)
   fact->oneOf(Parser::rule("<BRACKET>")->skip("(")->nonTerm(expr)->skip(")"),
               Parser::rule("<NUM>")->num());
 
-  program->repeat(Parser::rule("<BLOCK>")->nonTerm(expr)->skip(";"));
+  program->rep(Parser::rule("<BLOCK>")->nonTerm(expr)->skip(";"));
 
   Lexer* lexer = new Lexer();
   Node* root = program->parse(lexer);
@@ -55,11 +55,9 @@ void add_op()
 
 void sphingid_syntax()
 {
-  Parser* program = Parser::rule<RootNode>();
-
   Parser* primary_exp = Parser::rule();
   Parser* postfix_exp = Parser::rule();
-  Parser* arg_list = Parser::rule();
+  // Parser* arg_list = Parser::rule();
   Parser* arg_type = Parser::rule();
   Parser* unary_op = Parser::rule();
   Parser* unary_exp = Parser::rule();
@@ -81,7 +79,7 @@ void sphingid_syntax()
 
   Parser* keyword = Parser::rule();
 
-  Parser* fn_def = Parser::rule(); // = Parser::rule<FnDefNode>();
+  Parser* fn_def = Parser::rule<FnDefNode>("<FnDef>");
   Parser* fn_decl = Parser::rule<FnDeclNode>("<FnDecl>");
 
   Parser* op_def = Parser::rule(); // = Parser::rule<OpDefNode>();
@@ -89,15 +87,22 @@ void sphingid_syntax()
 
   Parser* class_def = Parser::rule<ClassNode>("<ClassDef>");
 
-  Parser* struct_def = Parser::rule(); // = Parser::rule<StructDefNode>();
-  Parser* struct_body = Parser::rule();
+  Parser* struct_def = Parser::rule<StructNode>();
 
-  Parser* compound_stat = Parser::rule();
+  Parser* compound_stat = Parser::rule()->skip("{")->cons(";")->skip("}");
   Parser* selection_stat = Parser::rule();
   Parser* iteration_stat = Parser::rule();
 
   std::set<string> reserved;
   reserved.insert("=");
+
+  // Parser* fn = Parser::rule<Lambda>()->id()->skip("(")->nonTerm(arg_list)->skip(")");
+
+  Parser* type = Parser::rule()->oneOf(Parser::rule()->cons("void"),
+                                       Parser::rule()->cons("double"),
+                                       Parser::rule()->cons("int"),
+                                       Parser::rule()->cons("keyword"),
+                                       Parser::rule()->cons("string"));
 
   unary_exp->oneOf(postfix_exp,
                    Parser::rule()->cons("++")->nonTerm(unary_exp),
@@ -163,24 +168,33 @@ void sphingid_syntax()
                     Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
 
-  arg_list->repeat(Parser::rule()->id()->id(reserved)->skip(","))->id();
-  arg_type->oneOf(Parser::rule<ArrayNode>()->repeat(Parser::rule()->id()->skip(","))->id(),
-                  Parser::rule<ArrayNode>()->id());
+  Parser* arg = Parser::rule<ArrayNode>()->id(reserved)->id();
+  Parser* arg_list = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->cons("void"),
+                                           Parser::rule<ArrayNode>()->rep(Parser::rule()->nonTerm(arg)->skip(","))->nonTerm(arg),
+                                           Parser::rule<ArrayNode>()->nonTerm(arg));
 
-  op_def->id(reserved)->skip("operator")->id()->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+  arg_type->oneOf(Parser::rule<ArrayNode>()->rep(Parser::rule()->id()->skip(","))->id(),
+                  Parser::rule<ArrayNode>()->id());
 
   fn_def->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_list)->skip(")")->nonTerm(compound_stat);
   fn_decl->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
 
-  Parser* class_body = Parser::rule<ArrayNode>()->repeat(fn_decl);
+  op_def->id(reserved)->skip("operator")->id()->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+
+  Parser* class_body = Parser::rule<ArrayNode>()->rep(fn_decl);
   class_def->skip("class")->id(reserved)->skip("{")->nonTerm(class_body)->skip("}")->skip(";");
 
+  Parser* var_decl = Parser::rule<ArrayNode>()->id(reserved)->id(reserved)->skip(";");
+  Parser* struct_body = Parser::rule<ArrayNode>()->rep(var_decl);
   struct_def->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";");
 
+  Parser* program = Parser::rule<RootNode>()->rep(Parser::rule()->oneOf(class_def, struct_def, fn_def));
+
   Lexer* lexer = new Lexer();
-  Node* root = class_def->parse(lexer);
+  Node* root = program->parse(lexer);
   cout << "$" << endl;
   if (root) cout << root->str() << endl;
+
   return ;
 }
 

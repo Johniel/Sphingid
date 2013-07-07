@@ -146,8 +146,8 @@ namespace sphingid
     std::string ArrayNode::str(void)
     {
       std::string s;
-      each(i, array_) s += (*i)->str() + "\n";
-      return s;
+      each(i, array_) s += (*i)->str() + ",";
+      return "{" + s + "}";
     }
 
     Node* ArrayNode::operator [] (int idx)
@@ -194,6 +194,41 @@ namespace sphingid
       return "(" + s + ")";
     }
 
+//------------------------------------------------------------------------------
+// class FnDefNode
+//
+//------------------------------------------------------------------------------
+
+    FnDefNode::FnDefNode(std::vector<Node*> v)
+    {
+      this->ret_  = (TermSymbolNode*)v[0];
+      this->name_ = v[1]->str();
+      std::vector<ArrayNode*> args = ((ArrayNode*)v[2])->vec<ArrayNode>();
+      for (size_t i = 0; i < args.size(); ++i) {
+        this->args_.push_back(make_pair((TermSymbolNode*)args[i]->nth(0), args[i]->nth(1)->str()));
+      }
+    }
+
+    FnDefNode::~FnDefNode()
+    {
+      if (ret_)  delete ret_;
+      for (size_t i = 0; i < args_.size(); ++i) {
+        delete args_[i].first;
+      }
+    }
+
+    std::string FnDefNode::str()
+    {
+      std::string s;
+      s += this->name_;
+      s += " :: ";
+      for (size_t i = 0; i < args_.size(); ++i) {
+        if (i) s += " -> ";
+        s += args_[i].first->str() + "(" + args_[i].second + ")";
+      }
+      s += " -> " + this->ret_->str();
+      return "(" + s + ")";
+    }
 
 //------------------------------------------------------------------------------
 // class ClassNode
@@ -230,6 +265,38 @@ namespace sphingid
 // class StructNode
 //
 //------------------------------------------------------------------------------
+
+    StructNode::StructNode()
+    {
+      assert(false);
+    }
+
+    StructNode::~StructNode()
+    {
+    }
+
+    std::string StructNode::str()
+    {
+      std::string s;
+      s += "struct ";
+      s += this->name_;
+      for (size_t i = 0; i < fn_.size(); ++i) {
+        s += "\n";
+        s += "(" + fn_[i].second + ":" + fn_[i].first + ")";
+      }
+      return "(" + s + ")";
+    }
+
+    StructNode::StructNode(std::vector<Node*> v)
+    {
+      std::vector<ArrayNode*> u = ((ArrayNode*)v[1])->vec<ArrayNode>();
+      for (size_t i = 0; i < u.size(); ++i) {
+        string type = u[i]->nth(0)->str();
+        string name = u[i]->nth(1)->str();
+        fn_.push_back(make_pair(type, name));
+      }
+      this->name_ = v[0]->str();
+    }
 
   }
 }

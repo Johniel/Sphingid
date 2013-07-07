@@ -157,7 +157,7 @@ namespace sphingid
 //
 //------------------------------------------------------------------------------
 
-    class Option : Rule {
+    class Option : public Rule {
     public:
       Option(Parser* p) : p_(p) {}
 
@@ -431,9 +431,16 @@ namespace sphingid
       return this;
     }
 
-    Parser* Parser::repeat(Parser* p)
+    Parser* Parser::rep(Parser* p)
     {
       rs_.push_back(new Repeat(p));
+      return this;
+    }
+
+    Parser* Parser::opt(Parser* p)
+    {
+      assert(false);
+      // rs_.push_back(new Option(p));
       return this;
     }
 
@@ -471,7 +478,7 @@ namespace sphingid
     Parser* Parser::operatorR(Parser* l, Parser* op, Parser* r)
     {
       Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
-      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(l)->repeat(rest);
+      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(l)->rep(rest);
       this->nonTerm(parser);
       return this;
     }
@@ -479,7 +486,7 @@ namespace sphingid
     Parser* Parser::operatorL(Parser* l, Parser* op, Parser* r)
     {
       Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
-      Parser* parser = rule<BinaryOpNodeL>()->nonTerm(l)->repeat(rest);
+      Parser* parser = rule<BinaryOpNodeL>()->nonTerm(l)->rep(rest);
       this->nonTerm(parser);
       return this;
     }
