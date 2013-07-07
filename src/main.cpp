@@ -77,7 +77,7 @@ void sphingid_syntax()
   Parser* const_exp = Parser::rule("<CONST EXP>");
   Parser* exp = Parser::rule("<EXP>");
 
-  Parser* keyword = Parser::rule();
+  Parser* keyword = Parser::rule<KeywordNode>();
 
   Parser* fn_def = Parser::rule<FnDefNode>("<FnDef>");
   Parser* fn_decl = Parser::rule<FnDeclNode>("<FnDecl>");
@@ -107,16 +107,16 @@ void sphingid_syntax()
 
   keyword->skip(":")->id(reserved);
 
-  primary_exp->oneOf(Parser::rule()->id(),
+  primary_exp->oneOf(keyword,
+                     Parser::rule()->id(),
                      Parser::rule()->num(),
                      Parser::rule()->str(),
-                     Parser::rule()->skip("(")->nonTerm(exp)->skip(")"),
-                     Parser::rule()->nonTerm(keyword));
+                     Parser::rule()->skip("(")->nonTerm(exp)->skip(")"));
 
   postfix_exp->oneOf(primary_exp,
                      // Parser::rule()->nonTerm(postfix_exp)->skip("[")->nonTerm(expression)->skip("]"),
                      Parser::rule()->nonTerm(postfix_exp)->skip("(")->skip(")"),
-                     Parser::rule()->nonTerm(postfix_exp)->skip("(")->rep(Parser::rule()->id())->skip(")"));
+                     Parser::rule()->nonTerm(postfix_exp)->skip("(")->nonTerm(Parser::rule<ArrayNode>()->rep(Parser::rule()->id()->skip(","))->id())->skip(")"));
 
   unary_exp->oneOf(postfix_exp,
                    Parser::rule()->cons("++")->nonTerm(unary_exp),

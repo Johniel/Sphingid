@@ -104,7 +104,20 @@ namespace sphingid
     bool StrLiteralNode::isConst(void) { assert(false); }
     bool StrLiteralNode::isLvalue(void) { assert(false); }
     int StrLiteralNode::allocSize(void) { assert(false); }
-    std::string StrLiteralNode::str(void) { return s_; }
+    std::string StrLiteralNode::str(void) { return "(" + s_ + ")"; }
+
+//------------------------------------------------------------------------------
+// class KeywordNode
+//
+//------------------------------------------------------------------------------
+
+    KeywordNode::KeywordNode(std::string s) : s_(":" + s) {}
+    KeywordNode::~KeywordNode() {}
+    bool KeywordNode::isAssignable(void) { assert(false); }
+    bool KeywordNode::isConst(void) { assert(false); }
+    bool KeywordNode::isLvalue(void) { assert(false); }
+    int KeywordNode::allocSize(void) { assert(false); }
+    std::string KeywordNode::str(void) { return "(" + s_ + ")"; }
 
 
 //------------------------------------------------------------------------------

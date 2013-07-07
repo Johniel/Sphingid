@@ -155,6 +155,26 @@ namespace sphingid
     };
 
 //------------------------------------------------------------------------------
+    class KeywordNode : public ExpNode
+    {
+    public:
+      KeywordNode(std::string);
+      virtual ~KeywordNode();
+      bool isAssignable(void);
+      bool isConst(void);
+      bool isLvalue(void);
+      int allocSize(void);
+      std::string str(void);
+      static Node* make(std::vector<Node*> v)
+      {
+        cout << "Keyword:make" << endl;
+        return new KeywordNode(v[0]->str());
+      }
+    private:
+      std::string s_;
+    };
+
+//------------------------------------------------------------------------------
     class TermSymbolNode : public Node {
     public:
       TermSymbolNode(std::string);
