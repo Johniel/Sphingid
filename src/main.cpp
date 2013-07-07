@@ -89,7 +89,7 @@ void sphingid_syntax()
 
   Parser* struct_def = Parser::rule<StructNode>();
 
-  Parser* compound_stat = Parser::rule();
+  Parser* compound_stat = Parser::rule<RootNode>();
   Parser* exp_stat = Parser::rule();
   Parser* selection_stat = Parser::rule();
   Parser* iteration_stat = Parser::rule();
