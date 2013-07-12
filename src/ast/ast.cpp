@@ -328,5 +328,50 @@ namespace sphingid
       this->name_ = v[0]->str();
     }
 
+//------------------------------------------------------------------------------
+// class FnCallNode
+//
+//------------------------------------------------------------------------------
+
+
+    FnCallNode::FnCallNode()
+    {
+      assert(false);
+    }
+
+    FnCallNode::~FnCallNode()
+    {
+    }
+
+    bool FnCallNode::isAssignable(void) { return false; }
+    bool FnCallNode::isConst(void) { return true; }
+    bool FnCallNode::isLvalue(void) { return false; }
+    int FnCallNode::allocSize(void) { return 0; }
+
+    std::string FnCallNode::str()
+    {
+      std::string s;
+      s += this->name_ + " ";
+      for (size_t i = 0; i < this->args_.size(); ++i) {
+        if (i) s += ", ";
+        s += args_[i]->str();
+      }
+      return "(" + s + ")";
+    }
+
+    FnCallNode::FnCallNode(std::vector<Node*> v)
+    {
+      // v[0] : function name
+      // v[1] : function args
+      this->name_ = v[0]->str();
+      if (1 < v.size()) {
+        ArrayNode* args = (ArrayNode*)v[1];
+        for (size_t i = 0; i < args->size(); ++i) {
+          this->args_.push_back((ExpNode*)(args->nth(i)));
+        }
+      }
+    }
+
+
   }
 }

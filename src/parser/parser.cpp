@@ -386,7 +386,6 @@ namespace sphingid
 
     int Parser::match(Lexer* lexer, int nth)
     {
-      // assert(rs_.size());
       if (rs_.empty()) {
         cerr << "[" << this->name_ << "] " << "empty parse rule" << endl;
         assert(false);
@@ -398,9 +397,17 @@ namespace sphingid
       int curr = nth;
       each (i, rs_) {
         int m = (*i)->match(lexer, curr);
-        if (m == 0) return memo_[(Token*)front] = 0;
+        if (m == 0) {
+#if 0
+          cout << "[" << this->name_ << "] Fail: " << lexer->peek(nth)->str() << endl;
+#endif
+          return memo_[(Token*)front] = 0;
+        }
         curr += m;
       }
+#if 0
+          cout << "[" << this->name_ << "] Succes: " << lexer->peek(nth)->str() << endl;
+#endif
       return memo_[(Token*)front] = curr - nth;
     }
 
@@ -478,7 +485,7 @@ namespace sphingid
       return this;
     }
 
-    Parser* Parser::operatorR(Parser* l, Parser* op, Parser* r)
+    Parser* Parser::opR(Parser* l, Parser* op, Parser* r)
     {
       Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
       Parser* parser = rule<BinaryOpNodeR>()->nonTerm(l)->rep(rest);
@@ -486,7 +493,7 @@ namespace sphingid
       return this;
     }
 
-    Parser* Parser::operatorL(Parser* l, Parser* op, Parser* r)
+    Parser* Parser::opL(Parser* l, Parser* op, Parser* r)
     {
       Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
       Parser* parser = rule<BinaryOpNodeL>()->nonTerm(l)->rep(rest);

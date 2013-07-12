@@ -16,4 +16,7 @@ int main(int argc, string args)
   1 + 2 * 3 / 4 % 5 + 6 - 7;
   :key;
   "first" + "second";
+  f();
+  g(2501);
+  h(1, 2, "str");
 }

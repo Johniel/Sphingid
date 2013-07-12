@@ -286,6 +286,28 @@ namespace sphingid
 
     } ;
 
+//------------------------------------------------------------------------------
+    class FnCallNode : public ExpNode {
+    public:
+      FnCallNode();
+      virtual ~FnCallNode();
+      virtual std::string str();
+      virtual bool isAssignable(void);
+      virtual bool isConst(void);
+      virtual bool isLvalue(void);
+      virtual int allocSize(void);
+      static Node* make(std::vector<Node*> v)
+      {
+        return new FnCallNode(v);
+      }
+    private:
+      FnCallNode(std::vector<Node*>);
+      std::string name_;
+      ExpNode* fn_;
+      std::vector<ExpNode*> args_;
+    };
+
+
   }
 }
 

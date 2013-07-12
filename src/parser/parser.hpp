@@ -49,8 +49,8 @@ namespace sphingid
       Parser* num(void);
       Parser* str(void);
       Parser* id(std::set<std::string> reserved = std::set<std::string>());
-      Parser* operatorR(Parser*, Parser*, Parser*);
-      Parser* operatorL(Parser*, Parser*, Parser*);
+      Parser* opR(Parser*, Parser*, Parser*);
+      Parser* opL(Parser*, Parser*, Parser*);
       // Parser* id(std::set<std::string>);
     private:
       Parser(MakeNodeFunc);
