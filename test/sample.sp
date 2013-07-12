@@ -8,6 +8,11 @@ struct StructName {
   string s;
 };
 
+struct Klass : ClassName {
+  int m;
+  string t;
+};
+
 int main(int argc, string args)
 {
   2501;

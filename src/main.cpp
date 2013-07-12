@@ -87,7 +87,7 @@ void sphingid_syntax()
 
   Parser* class_def = Parser::rule<ClassNode>("<ClassDef>");
 
-  Parser* struct_def = Parser::rule<StructNode>();
+  Parser* struct_def = Parser::rule(); // Parser::rule<StructNode>();
 
   Parser* compound_stat = Parser::rule<RootNode>();
   Parser* exp_stat = Parser::rule();
@@ -207,9 +207,13 @@ void sphingid_syntax()
   Parser* class_body = Parser::rule<ArrayNode>()->rep(fn_decl);
   class_def->skip("class")->id(reserved)->skip("{")->nonTerm(class_body)->skip("}")->skip(";");
 
+  Parser* derive = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->skip(":")->rep(Parser::rule()->id()->skip(","))->id(),
+                                         Parser::rule<ArrayNode>()->skip(":")->id());
+
   Parser* var_decl = Parser::rule<ArrayNode>()->id(reserved)->id(reserved)->skip(";");
   Parser* struct_body = Parser::rule<ArrayNode>()->rep(var_decl);
-  struct_def->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";");
+  struct_def->oneOf(Parser::rule<StructNode>()->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";"),
+                    Parser::rule<StructNode>()->skip("struct")->id(reserved)->nonTerm(derive)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";"));
 
   Parser* program = Parser::rule<RootNode>()->rep(Parser::rule()->oneOf(class_def, struct_def, fn_def));
 

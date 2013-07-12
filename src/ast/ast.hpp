@@ -283,7 +283,7 @@ namespace sphingid
       StructNode(std::vector<Node*>) ;
       std::string name_;
       std::vector< std::pair<std::string, std::string> > fn_;
-
+      std::vector<std::string> klass_;
     } ;
 
 //------------------------------------------------------------------------------

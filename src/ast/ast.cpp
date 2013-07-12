@@ -310,6 +310,12 @@ namespace sphingid
       std::string s;
       s += "struct ";
       s += this->name_;
+      s += " : ";
+      s += "[";
+      for (size_t i = 0; i < klass_.size(); ++i) {
+        s += klass_[i] + ", ";
+      }
+      s += "]";
       for (size_t i = 0; i < fn_.size(); ++i) {
         s += "\n";
         s += "(" + fn_[i].second + ":" + fn_[i].first + ")";
@@ -319,13 +325,29 @@ namespace sphingid
 
     StructNode::StructNode(std::vector<Node*> v)
     {
-      std::vector<ArrayNode*> u = ((ArrayNode*)v[1])->vec<ArrayNode>();
-      for (size_t i = 0; i < u.size(); ++i) {
-        string type = u[i]->nth(0)->str();
-        string name = u[i]->nth(1)->str();
-        fn_.push_back(make_pair(type, name));
+      if (v.size() == 2) { // v[0] name, v[1] body
+        this->name_ = v[0]->str();
+        std::vector<ArrayNode*> u = ((ArrayNode*)v[1])->vec<ArrayNode>();
+        for (size_t i = 0; i < u.size(); ++i) {
+          string type = u[i]->nth(0)->str();
+          string name = u[i]->nth(1)->str();
+          this->fn_.push_back(make_pair(type, name));
+        }
+      } else if (v.size() == 3) { // v[0] name, v[1] class, v[2] body
+        this->name_ = v[0]->str();
+        std::vector<Node*> w = ((ArrayNode*)v[1])->vec<Node>();
+        for (size_t i = 0; i < w.size(); ++i) {
+          this->klass_.push_back(w[i]->str());
+        }
+        std::vector<ArrayNode*> u = ((ArrayNode*)v[2])->vec<ArrayNode>();
+        for (size_t i = 0; i < u.size(); ++i) {
+          string type = u[i]->nth(0)->str();
+          string name = u[i]->nth(1)->str();
+          this->fn_.push_back(make_pair(type, name));
+        }
+      } else {
+        assert(false);
       }
-      this->name_ = v[0]->str();
     }
 
 //------------------------------------------------------------------------------
