@@ -287,6 +287,7 @@ namespace sphingid
     } ;
 
 //------------------------------------------------------------------------------
+
     class FnCallNode : public ExpNode {
     public:
       FnCallNode();
@@ -307,6 +308,21 @@ namespace sphingid
       std::vector<ExpNode*> args_;
     };
 
+//------------------------------------------------------------------------------
+    class SelectionNode : public StatNode {
+    public:
+      virtual ~SelectionNode();
+      virtual std::string str();
+      static Node* make(std::vector<Node*> v)
+      {
+        return new SelectionNode(v);
+      }
+    private:
+      SelectionNode(std::vector<Node*>);
+      ExpNode* cond_;
+      Node* then_;
+      Node* else_;
+    };
 
   }
 }

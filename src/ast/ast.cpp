@@ -395,6 +395,41 @@ namespace sphingid
       }
     }
 
+//------------------------------------------------------------------------------
+// class SelectionNode
+//
+//------------------------------------------------------------------------------
+
+    SelectionNode::~SelectionNode()
+    {
+      if (this->cond_) delete this->cond_;
+      if (this->then_) delete this->then_;
+      if (this->else_) delete this->else_;
+    }
+    std::string SelectionNode::str()
+    {
+      std::string s;
+      s += "if ";
+      s += this->cond_->str();
+      s += "\n";
+      s += this->then_->str();
+      if (this->else_) {
+        s += "\n";
+        s += this->else_->str();
+      }
+      return "(" + s + ")";
+    }
+
+    SelectionNode::SelectionNode(std::vector<Node*> v)
+    {
+      assert(2 <= v.size());
+      // v[0] : cond
+      // v[1] : then
+      // v[2] : else ?
+      this->cond_ = (ExpNode*)v[0];
+      this->then_ = v[1];
+      this->else_ = (v.size() == 3) ? v[2] : NULL;
+    }
 
   }
 }

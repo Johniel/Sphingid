@@ -24,8 +24,15 @@ int main(int argc, string args)
   f();
   g(2501);
   h(1, 2, "str");
-  {
-    for;
-    1 + 2;
+  if (1) {
+    "true";
+    "false";
+  }
+  if (1) {
+    "true";
+    "TRUE";
+  } else {
+    "false";
+    "FALSE";
   }
 }

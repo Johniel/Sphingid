@@ -91,7 +91,7 @@ void sphingid_syntax()
 
   Parser* compound_stat = Parser::rule<RootNode>();
   Parser* exp_stat = Parser::rule();
-  Parser* selection_stat = Parser::rule();
+  Parser* selection_stat = Parser::rule("<SELECTION>");// Parser::rule<SelectionNode>("<SELECTION>");
   Parser* iteration_stat = Parser::rule();
 
   std::set<string> reserved;
@@ -191,10 +191,12 @@ void sphingid_syntax()
   exp->nonTerm(assignment);
   exp_stat->nonTerm(exp)->skip(";");
 
-  selection_stat->oneOf(Parser::rule()->cons("if"), Parser::rule()->cons("else"));
-  iteration_stat->oneOf(Parser::rule()->cons("for"), Parser::rule()->cons("while"), Parser::rule()->cons("do"));
+  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat);
 
-  Parser* stat = Parser::rule()->oneOf(exp_stat, compound_stat, selection_stat, iteration_stat);
+  selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat)->skip("else")->nonTerm(stat),
+                        Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat));
+
+  iteration_stat->oneOf(Parser::rule()->cons("for"), Parser::rule()->cons("while"), Parser::rule()->cons("do"));
 
   compound_stat->skip("{")->rep(stat)->skip("}");
 
