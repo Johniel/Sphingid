@@ -187,9 +187,16 @@ void sphingid_syntax()
                     Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
 
+
   exp->nonTerm(assignment);
   exp_stat->nonTerm(exp)->skip(";");
-  compound_stat->skip("{")->rep(exp_stat)->skip("}");
+
+  selection_stat->oneOf(Parser::rule()->cons("if"), Parser::rule()->cons("else"));
+  iteration_stat->oneOf(Parser::rule()->cons("for"), Parser::rule()->cons("while"), Parser::rule()->cons("do"));
+
+  Parser* stat = Parser::rule()->oneOf(exp_stat, compound_stat, selection_stat, iteration_stat);
+
+  compound_stat->skip("{")->rep(stat)->skip("}");
 
   Parser* arg = Parser::rule<ArrayNode>()->id(reserved)->id();
   Parser* arg_list = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->cons("void"),

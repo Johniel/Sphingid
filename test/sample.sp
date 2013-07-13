@@ -24,4 +24,8 @@ int main(int argc, string args)
   f();
   g(2501);
   h(1, 2, "str");
+  {
+    for;
+    1 + 2;
+  }
 }

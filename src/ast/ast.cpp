@@ -28,9 +28,10 @@ namespace sphingid
     {
       std::string s;
       each (i, next_) {
-        s += (*i)->str() + "\n";
+        if (i != next_.begin()) s += "\n";
+        s += (*i)->str();
       }
-      return s;
+      return "(" + s + ")";
     }
 
 //------------------------------------------------------------------------------
