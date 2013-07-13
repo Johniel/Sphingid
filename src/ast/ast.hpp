@@ -263,6 +263,23 @@ namespace sphingid
       std::vector<FnDeclNode*> fn_;
     } ;
 
+
+//------------------------------------------------------------------------------
+
+    class VarNode : public StatNode {
+    public:
+      virtual ~VarNode();
+      virtual std::string str();
+      static Node* make(std::vector<Node*> v)
+      {
+        return new VarNode(v);
+      }
+    private:
+      VarNode(std::vector<Node*>);
+      std::string type_;
+      std::string name_;
+    };
+
 //------------------------------------------------------------------------------
     class StructNode : public StatNode {
     public:
@@ -282,7 +299,7 @@ namespace sphingid
     private:
       StructNode(std::vector<Node*>) ;
       std::string name_;
-      std::vector< std::pair<std::string, std::string> > fn_;
+      std::vector<VarNode*> mem_;
       std::vector<std::string> klass_;
     } ;
 

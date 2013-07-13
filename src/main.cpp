@@ -195,7 +195,9 @@ void sphingid_syntax()
                                                     Parser::rule<JumpNode>()->cons("break"),
                                                     Parser::rule<JumpNode>()->cons("continue"));
 
-  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat, jump_stat);
+  Parser* var_decl = Parser::rule<VarNode>()->id(reserved)->id(reserved)->skip(";");
+
+  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat, jump_stat, var_decl);
 
   selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat)->skip("else")->nt(stat),
                         Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat));
@@ -228,7 +230,6 @@ void sphingid_syntax()
   Parser* derive = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->skip(":")->rep(Parser::rule()->id()->skip(","))->id(),
                                          Parser::rule<ArrayNode>()->skip(":")->id());
 
-  Parser* var_decl = Parser::rule<ArrayNode>()->id(reserved)->id(reserved)->skip(";");
   Parser* struct_body = Parser::rule<ArrayNode>()->rep(var_decl);
   struct_def->oneOf(Parser::rule<StructNode>()->skip("struct")->id(reserved)->skip("{")->nt(struct_body)->skip("}")->skip(";"),
                     Parser::rule<StructNode>()->skip("struct")->id(reserved)->nt(derive)->skip("{")->nt(struct_body)->skip("}")->skip(";"));

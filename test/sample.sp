@@ -46,8 +46,10 @@ int main(int argc, string args)
       return ;
     }
   }
-  for (1; 2; 3) {
+  for (1; i <= n; 3) {
     4;
   }
+  int n;
+  char c;  
   return 42;
 }

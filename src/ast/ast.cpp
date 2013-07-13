@@ -302,9 +302,7 @@ namespace sphingid
       assert(false);
     }
 
-    StructNode::~StructNode()
-    {
-    }
+    StructNode::~StructNode() {}
 
     std::string StructNode::str()
     {
@@ -317,38 +315,32 @@ namespace sphingid
         s += klass_[i] + ", ";
       }
       s += "]";
-      for (size_t i = 0; i < fn_.size(); ++i) {
+      for (size_t i = 0; i < mem_.size(); ++i) {
         s += "\n";
-        s += "(" + fn_[i].second + ":" + fn_[i].first + ")";
+        s += mem_[i]->str();
       }
       return "(" + s + ")";
     }
 
     StructNode::StructNode(std::vector<Node*> v)
     {
-      if (v.size() == 2) { // v[0] name, v[1] body
-        this->name_ = v[0]->str();
-        std::vector<ArrayNode*> u = ((ArrayNode*)v[1])->vec<ArrayNode>();
-        for (size_t i = 0; i < u.size(); ++i) {
-          string type = u[i]->nth(0)->str();
-          string name = u[i]->nth(1)->str();
-          this->fn_.push_back(make_pair(type, name));
-        }
-      } else if (v.size() == 3) { // v[0] name, v[1] class, v[2] body
-        this->name_ = v[0]->str();
+      int idx = 0;
+      // v[idx] name
+      this->name_ = v[idx]->str();
+      ++idx;
+
+      // v[idx] class
+      if (v.size() == 3) {
         std::vector<Node*> w = ((ArrayNode*)v[1])->vec<Node>();
         for (size_t i = 0; i < w.size(); ++i) {
           this->klass_.push_back(w[i]->str());
         }
-        std::vector<ArrayNode*> u = ((ArrayNode*)v[2])->vec<ArrayNode>();
-        for (size_t i = 0; i < u.size(); ++i) {
-          string type = u[i]->nth(0)->str();
-          string name = u[i]->nth(1)->str();
-          this->fn_.push_back(make_pair(type, name));
-        }
-      } else {
-        assert(false);
+        ++idx;
       }
+
+      // v[2] body
+      this->mem_= ((ArrayNode*)v[idx])->vec<VarNode>();
+      ++idx;
     }
 
 //------------------------------------------------------------------------------
@@ -517,5 +509,30 @@ namespace sphingid
       this->afterthought_ = (4 == v.size()) ? (ExpNode*)v[2] : NULL;
       this->body_ = (StatNode*)v.back();
     }
+
+
+//------------------------------------------------------------------------------
+// class VarDeclNode
+//
+//------------------------------------------------------------------------------
+
+    VarNode::~VarNode() {}
+
+    std::string VarNode::str()
+    {
+      std::string s;
+      s += this->name_;
+      s += ":";
+      s += this->type_;
+      return "(" + s + ")";
+    }
+
+    VarNode::VarNode(std::vector<Node*> v)
+    {
+      assert(v.size() <= 2);
+      this->type_ = v[0]->str();
+      this->name_ = v[1]->str();
+    }
+
   }
 }
