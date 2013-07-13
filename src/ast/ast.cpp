@@ -431,5 +431,34 @@ namespace sphingid
       this->else_ = (v.size() == 3) ? v[2] : NULL;
     }
 
+//------------------------------------------------------------------------------
+// class WhileNode
+//
+//------------------------------------------------------------------------------
+
+    WhileNode::~WhileNode()
+    {
+      if (this->cond_) delete this->cond_;
+      if (this->body_) delete this->body_;
+    }
+    std::string WhileNode::str()
+    {
+      std::string s;
+      s += "while ";
+      s += this->cond_->str();
+      s += "\n";
+      s += this->body_->str();
+      return "(" + s + ")";
+    }
+
+    WhileNode::WhileNode(std::vector<Node*> v)
+    {
+      assert(2 == v.size());
+      // v[0] : cond
+      // v[1] : body
+      this->cond_ = (ExpNode*)v[0];
+      this->body_ = v[1];
+    }
+
   }
 }

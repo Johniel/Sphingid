@@ -35,4 +35,7 @@ int main(int argc, string args)
     "false";
     "FALSE";
   }
+  while (1) {
+    "while loop";
+  }
 }

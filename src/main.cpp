@@ -196,7 +196,10 @@ void sphingid_syntax()
   selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat)->skip("else")->nonTerm(stat),
                         Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat));
 
-  iteration_stat->oneOf(Parser::rule()->cons("for"), Parser::rule()->cons("while"), Parser::rule()->cons("do"));
+  Parser* for_stat = Parser::rule()->cons("for");
+  Parser* while_stat = Parser::rule<WhileNode>()->skip("while")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat);
+  Parser* do_stat = Parser::rule()->cons("do");
+  iteration_stat->oneOf(for_stat, while_stat, do_stat);
 
   compound_stat->skip("{")->rep(stat)->skip("}");
 

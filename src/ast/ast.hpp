@@ -324,6 +324,22 @@ namespace sphingid
       Node* else_;
     };
 
+
+//------------------------------------------------------------------------------
+    class WhileNode : public StatNode {
+    public:
+      virtual ~WhileNode();
+      virtual std::string str();
+      static Node* make(std::vector<Node*> v)
+      {
+        return new WhileNode(v);
+      }
+    private:
+      WhileNode(std::vector<Node*>);
+      ExpNode* cond_;
+      Node* body_;
+    };
+
   }
 }
 
