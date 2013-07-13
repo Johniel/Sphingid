@@ -436,7 +436,7 @@ namespace sphingid
       return this;
     }
 
-    Parser* Parser::nonTerm(Parser* p)
+    Parser* Parser::nt(Parser* p)
     {
       rs_.push_back(new NonTerm(p));
       return this;
@@ -488,17 +488,17 @@ namespace sphingid
 
     Parser* Parser::opR(Parser* l, Parser* op, Parser* r)
     {
-      Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
-      Parser* parser = rule<BinaryOpNodeR>()->nonTerm(l)->rep(rest);
-      this->nonTerm(parser);
+      Parser* rest = rule<ast::ArrayNode>()->nt(op)->nt(r);
+      Parser* parser = rule<BinaryOpNodeR>()->nt(l)->rep(rest);
+      this->nt(parser);
       return this;
     }
 
     Parser* Parser::opL(Parser* l, Parser* op, Parser* r)
     {
-      Parser* rest = rule<ast::ArrayNode>()->nonTerm(op)->nonTerm(r);
-      Parser* parser = rule<BinaryOpNodeL>()->nonTerm(l)->rep(rest);
-      this->nonTerm(parser);
+      Parser* rest = rule<ast::ArrayNode>()->nt(op)->nt(r);
+      Parser* parser = rule<BinaryOpNodeL>()->nt(l)->rep(rest);
+      this->nt(parser);
       return this;
     }
   }

@@ -45,7 +45,7 @@ namespace sphingid
       Parser* option(Parser*);
       Parser* rep(Parser*);
       Parser* opt(Parser*);
-      Parser* nonTerm(Parser*);
+      Parser* nt(Parser*);
       Parser* num(void);
       Parser* str(void);
       Parser* id(std::set<std::string> reserved = std::set<std::string>());
