@@ -39,12 +39,12 @@ int main(int argc, string args)
   } else {
     "false";
     "FALSE";
-  }
-  while (1) {
-    "while loop";
-    break;
-    continue;
-    return ;
+    while (1) {
+      "while loop";
+      break;
+      continue;
+      return ;
+    }
   }
   return 42;
 }

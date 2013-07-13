@@ -6,7 +6,7 @@
   ;; keyword
   '("class" "struct"
     "true" "false"
-    "if" "for" "while" "do"
+    "if" "for" "while" "do" "else"
     "return" "continue" "break")
   ;; regexp and face
   '(("int\\|char\\|string\\|double\\|lli" . 'font-lock-type-face))
