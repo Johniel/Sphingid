@@ -46,5 +46,8 @@ int main(int argc, string args)
       return ;
     }
   }
+  for (1; 2; 3) {
+    4;
+  }
   return 42;
 }

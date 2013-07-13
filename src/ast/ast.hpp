@@ -357,6 +357,29 @@ namespace sphingid
       ExpNode* val_;
     };
 
+
+//------------------------------------------------------------------------------
+
+    class ForNode : public StatNode {
+    public:
+      virtual ~ForNode();
+      virtual std::string str();
+      static Node* make(std::vector<Node*> v)
+      {
+        cout << "ForNode" << endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << " : " << v[i]->str() << endl;
+        }
+        return new ForNode(v);
+      }
+    private:
+      ForNode(std::vector<Node*>);
+      ExpNode* init_;
+      ExpNode* cond_;
+      ExpNode* afterthought_;
+      StatNode* body_;
+    };
+
   }
 }
 

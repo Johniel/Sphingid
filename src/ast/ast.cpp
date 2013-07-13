@@ -485,5 +485,37 @@ namespace sphingid
       this->val_ =  (2 <= v.size()) ? (ExpNode*)v[1] : NULL;
     }
 
+
+//------------------------------------------------------------------------------
+// class ForNode
+//
+//------------------------------------------------------------------------------
+
+    ForNode::~ForNode() {}
+
+    std::string ForNode::str()
+    {
+      std::string s;
+      s += "for";
+      s += " ";
+      s += this->init_->str() + " ";
+      s += this->cond_->str() + " ";
+      s +=(this->afterthought_ ? this->afterthought_->str() : "()") + "\n";
+      s += this->body_->str();
+      return "(" + s + ")";
+    }
+
+    ForNode::ForNode(std::vector<Node*> v)
+    {
+      assert(v.size() <= 4);
+      // v[0] : int i;
+      // v[1] : i < n;
+      // v[2] :
+      // v[3] :
+      this->init_ = (ExpNode*)v[0];
+      this->cond_ = (ExpNode*)v[1];
+      this->afterthought_ = (4 == v.size()) ? (ExpNode*)v[2] : NULL;
+      this->body_ = (StatNode*)v.back();
+    }
   }
 }

@@ -30,10 +30,10 @@ void arithmetic(void)
   term->oneOf(Parser::rule()->opL(fact, term_op, fact),
               fact);
 
-  fact->oneOf(Parser::rule("<BRACKET>")->skip("(")->nonTerm(expr)->skip(")"),
+  fact->oneOf(Parser::rule("<BRACKET>")->skip("(")->nt(expr)->skip(")"),
               Parser::rule("<NUM>")->num());
 
-  program->rep(Parser::rule("<BLOCK>")->nonTerm(expr)->skip(";"));
+  program->rep(Parser::rule("<BLOCK>")->nt(expr)->skip(";"));
 
   Lexer* lexer = new Lexer();
   Node* root = program->parse(lexer);
@@ -97,7 +97,7 @@ void sphingid_syntax()
   std::set<string> reserved;
   reserved.insert("=");
 
-  // Parser* fn = Parser::rule<Lambda>()->id()->skip("(")->nonTerm(arg_list)->skip(")");
+  // Parser* fn = Parser::rule<Lambda>()->id()->skip("(")->nt(arg_list)->skip(")");
 
   Parser* type = Parser::rule()->oneOf(Parser::rule()->cons("void"),
                                        Parser::rule()->cons("double"),
@@ -111,26 +111,26 @@ void sphingid_syntax()
                      Parser::rule()->id(),
                      Parser::rule()->num(),
                      Parser::rule()->str(),
-                     Parser::rule()->skip("(")->nonTerm(exp)->skip(")"));
+                     Parser::rule()->skip("(")->nt(exp)->skip(")"));
 
-  Parser* fn_call_arg = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->rep(Parser::rule()->nonTerm(exp)->skip(","))->nonTerm(exp),
-                                              Parser::rule<ArrayNode>()->nonTerm(exp));
+  Parser* fn_call_arg = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->rep(Parser::rule()->nt(exp)->skip(","))->nt(exp),
+                                              Parser::rule<ArrayNode>()->nt(exp));
 
   postfix_exp->oneOf(Parser::rule<FnCallNode>()->id()->skip("(")->skip(")"),
-                     Parser::rule<FnCallNode>()->id()->skip("(")->nonTerm(fn_call_arg)->skip(")"),
-                     Parser::rule<FnCallNode>()->skip("(")->nonTerm(exp)->skip(")")->skip("(")->nonTerm(fn_call_arg)->skip(")"),
-                     Parser::rule()->id()->skip("[")->nonTerm(exp)->skip("]"),
-                     Parser::rule()->skip("(")->nonTerm(exp)->skip(")")->skip("[")->nonTerm(exp)->skip("]"),
+                     Parser::rule<FnCallNode>()->id()->skip("(")->nt(fn_call_arg)->skip(")"),
+                     Parser::rule<FnCallNode>()->skip("(")->nt(exp)->skip(")")->skip("(")->nt(fn_call_arg)->skip(")"),
+                     Parser::rule()->id()->skip("[")->nt(exp)->skip("]"),
+                     Parser::rule()->skip("(")->nt(exp)->skip(")")->skip("[")->nt(exp)->skip("]"),
                      primary_exp);
 
   unary_exp->oneOf(postfix_exp,
-                   Parser::rule()->cons("++")->nonTerm(unary_exp),
-                   Parser::rule()->cons("--")->nonTerm(unary_exp),
-                   Parser::rule()->cons("+")->nonTerm(unary_exp),
-                   Parser::rule()->cons("-")->nonTerm(unary_exp),
-                   Parser::rule()->cons("!")->nonTerm(unary_exp),
-                   Parser::rule()->cons("~")->nonTerm(unary_exp),
-                   Parser::rule()->nonTerm(unary_op)->nonTerm(unary_exp));
+                   Parser::rule()->cons("++")->nt(unary_exp),
+                   Parser::rule()->cons("--")->nt(unary_exp),
+                   Parser::rule()->cons("+")->nt(unary_exp),
+                   Parser::rule()->cons("-")->nt(unary_exp),
+                   Parser::rule()->cons("!")->nt(unary_exp),
+                   Parser::rule()->cons("~")->nt(unary_exp),
+                   Parser::rule()->nt(unary_op)->nt(unary_exp));
 
   Parser* multiplicative_op = Parser::rule()->oneOf(Parser::rule()->cons("*"),
                                                     Parser::rule()->cons("/"),
@@ -173,35 +173,37 @@ void sphingid_syntax()
   logical_or->oneOf(Parser::rule()->opL(logical_and, Parser::rule()->cons("||"), logical_and),
                     logical_and);
 
-  conditional->oneOf(Parser::rule()->nonTerm(logical_or)->skip("?")->nonTerm(exp)->skip(":")->nonTerm(conditional),
+  conditional->oneOf(Parser::rule()->nt(logical_or)->skip("?")->nt(exp)->skip(":")->nt(conditional),
                      logical_or);
 
   assignment->oneOf(conditional,
-                    Parser::rule()->nonTerm(unary_exp)->cons("=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("*=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("/=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("+=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("-=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("%=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("&=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
-                    Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
+                    Parser::rule()->nt(unary_exp)->cons("=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("*=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("/=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("+=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("-=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("%=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("&=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("|=")->nt(assignment),
+                    Parser::rule()->nt(unary_exp)->cons("^=")->nt(assignment));
 
-  exp->nonTerm(assignment);
-  exp_stat->nonTerm(exp)->skip(";");
+  exp->nt(assignment);
+  exp_stat->nt(exp)->skip(";");
 
-  Parser* jump_stat = Parser::rule("<JUMP>")->oneOf(Parser::rule<JumpNode>("<RETRUN EXP>")->cons("return")->nonTerm(exp_stat),
+  Parser* jump_stat = Parser::rule("<JUMP>")->oneOf(Parser::rule<JumpNode>("<RETRUN EXP>")->cons("return")->nt(exp_stat),
                                                     Parser::rule<JumpNode>("<RETURN>")->cons("return"),
                                                     Parser::rule<JumpNode>()->cons("break"),
                                                     Parser::rule<JumpNode>()->cons("continue"));
 
   Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat, jump_stat);
 
-  selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat)->skip("else")->nonTerm(stat),
-                        Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat));
+  selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat)->skip("else")->nt(stat),
+                        Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat));
 
-  Parser* for_stat = Parser::rule()->cons("for");
-  Parser* while_stat = Parser::rule<WhileNode>()->skip("while")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat);
+  Parser* for_stat = Parser::rule()->oneOf(Parser::rule<ForNode>()->skip("for")->skip("(")->nt(exp_stat)->nt(exp_stat)->nt(exp)->skip(")")->nt(stat),
+                                           Parser::rule<ForNode>()->skip("for")->skip("(")->nt(exp_stat)->nt(exp_stat)->skip(")")->nt(stat));
+
+  Parser* while_stat = Parser::rule<WhileNode>()->skip("while")->skip("(")->nt(exp)->skip(")")->nt(stat);
   Parser* do_stat = Parser::rule()->cons("do");
   iteration_stat->oneOf(for_stat, while_stat, do_stat);
 
@@ -209,27 +211,27 @@ void sphingid_syntax()
 
   Parser* arg = Parser::rule<ArrayNode>()->id(reserved)->id();
   Parser* arg_list = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->cons("void"),
-                                           Parser::rule<ArrayNode>()->rep(Parser::rule()->nonTerm(arg)->skip(","))->nonTerm(arg),
-                                           Parser::rule<ArrayNode>()->nonTerm(arg));
+                                           Parser::rule<ArrayNode>()->rep(Parser::rule()->nt(arg)->skip(","))->nt(arg),
+                                           Parser::rule<ArrayNode>()->nt(arg));
 
   arg_type->oneOf(Parser::rule<ArrayNode>()->rep(Parser::rule()->id()->skip(","))->id(),
                   Parser::rule<ArrayNode>()->id());
 
-  fn_def->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_list)->skip(")")->nonTerm(compound_stat);
-  fn_decl->id(reserved)->id(reserved)->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+  fn_def->id(reserved)->id(reserved)->skip("(")->nt(arg_list)->skip(")")->nt(compound_stat);
+  fn_decl->id(reserved)->id(reserved)->skip("(")->nt(arg_type)->skip(")")->skip(";");
 
-  op_def->id(reserved)->skip("operator")->id()->skip("(")->nonTerm(arg_type)->skip(")")->skip(";");
+  op_def->id(reserved)->skip("operator")->id()->skip("(")->nt(arg_type)->skip(")")->skip(";");
 
   Parser* class_body = Parser::rule<ArrayNode>()->rep(fn_decl);
-  class_def->skip("class")->id(reserved)->skip("{")->nonTerm(class_body)->skip("}")->skip(";");
+  class_def->skip("class")->id(reserved)->skip("{")->nt(class_body)->skip("}")->skip(";");
 
   Parser* derive = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->skip(":")->rep(Parser::rule()->id()->skip(","))->id(),
                                          Parser::rule<ArrayNode>()->skip(":")->id());
 
   Parser* var_decl = Parser::rule<ArrayNode>()->id(reserved)->id(reserved)->skip(";");
   Parser* struct_body = Parser::rule<ArrayNode>()->rep(var_decl);
-  struct_def->oneOf(Parser::rule<StructNode>()->skip("struct")->id(reserved)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";"),
-                    Parser::rule<StructNode>()->skip("struct")->id(reserved)->nonTerm(derive)->skip("{")->nonTerm(struct_body)->skip("}")->skip(";"));
+  struct_def->oneOf(Parser::rule<StructNode>()->skip("struct")->id(reserved)->skip("{")->nt(struct_body)->skip("}")->skip(";"),
+                    Parser::rule<StructNode>()->skip("struct")->id(reserved)->nt(derive)->skip("{")->nt(struct_body)->skip("}")->skip(";"));
 
   Parser* program = Parser::rule<RootNode>()->rep(Parser::rule()->oneOf(class_def, struct_def, fn_def));
 
