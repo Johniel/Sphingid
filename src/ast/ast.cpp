@@ -460,5 +460,30 @@ namespace sphingid
       this->body_ = v[1];
     }
 
+//------------------------------------------------------------------------------
+// class JumpNode
+//
+//------------------------------------------------------------------------------
+
+    JumpNode::~JumpNode() {}
+
+    std::string JumpNode::str()
+    {
+      std::string s;
+      s += stat_;
+      s += " ";
+      if (this->val_) s += this->val_->str();
+      return "(" + s + ")";
+    }
+
+    JumpNode::JumpNode(std::vector<Node*> v)
+    {
+      assert(v.size() <= 2);
+      // v[0] : stat
+      // v[1] : val
+      this->stat_ = v[0]->str();
+      this->val_ =  (2 <= v.size()) ? (ExpNode*)v[1] : NULL;
+    }
+
   }
 }

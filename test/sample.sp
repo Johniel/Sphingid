@@ -13,6 +13,11 @@ struct Klass : ClassName {
   string t;
 };
 
+int add(int a, int b)
+{
+  return a + b;
+}
+
 int main(int argc, string args)
 {
   2501;
@@ -37,5 +42,9 @@ int main(int argc, string args)
   }
   while (1) {
     "while loop";
+    break;
+    continue;
+    return ;
   }
+  return 42;
 }

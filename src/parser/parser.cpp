@@ -398,14 +398,15 @@ namespace sphingid
       each (i, rs_) {
         int m = (*i)->match(lexer, curr);
         if (m == 0) {
-#if 0
+#define A 1
+#if A
           cout << "[" << this->name_ << "] Fail: " << lexer->peek(nth)->str() << endl;
 #endif
           return memo_[(Token*)front] = 0;
         }
         curr += m;
       }
-#if 0
+#if A
           cout << "[" << this->name_ << "] Succes: " << lexer->peek(nth)->str() << endl;
 #endif
       return memo_[(Token*)front] = curr - nth;

@@ -326,6 +326,7 @@ namespace sphingid
 
 
 //------------------------------------------------------------------------------
+
     class WhileNode : public StatNode {
     public:
       virtual ~WhileNode();
@@ -338,6 +339,22 @@ namespace sphingid
       WhileNode(std::vector<Node*>);
       ExpNode* cond_;
       Node* body_;
+    };
+
+//------------------------------------------------------------------------------
+
+    class JumpNode : public StatNode {
+    public:
+      virtual ~JumpNode();
+      virtual std::string str();
+      static Node* make(std::vector<Node*> v)
+      {
+        return new JumpNode(v);
+      }
+    private:
+      JumpNode(std::vector<Node*>);
+      std::string stat_;
+      ExpNode* val_;
     };
 
   }

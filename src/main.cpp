@@ -55,7 +55,7 @@ void add_op()
 
 void sphingid_syntax()
 {
-  Parser* primary_exp = Parser::rule();
+  Parser* primary_exp = Parser::rule("<PRYMARY>");
   Parser* postfix_exp = Parser::rule("<POSTFIX>");
   // Parser* arg_list = Parser::rule();
   Parser* arg_type = Parser::rule();
@@ -77,7 +77,7 @@ void sphingid_syntax()
   Parser* const_exp = Parser::rule("<CONST EXP>");
   Parser* exp = Parser::rule("<EXP>");
 
-  Parser* keyword = Parser::rule<KeywordNode>();
+  Parser* keyword = Parser::rule<KeywordNode>("<KEYWORD>");
 
   Parser* fn_def = Parser::rule<FnDefNode>("<FnDef>");
   Parser* fn_decl = Parser::rule<FnDeclNode>("<FnDecl>");
@@ -87,9 +87,9 @@ void sphingid_syntax()
 
   Parser* class_def = Parser::rule<ClassNode>("<ClassDef>");
 
-  Parser* struct_def = Parser::rule(); // Parser::rule<StructNode>();
+  Parser* struct_def = Parser::rule("<STRUCT>"); // Parser::rule<StructNode>();
 
-  Parser* compound_stat = Parser::rule<RootNode>();
+  Parser* compound_stat = Parser::rule<RootNode>("<COMPOUND>");
   Parser* exp_stat = Parser::rule();
   Parser* selection_stat = Parser::rule("<SELECTION>");// Parser::rule<SelectionNode>("<SELECTION>");
   Parser* iteration_stat = Parser::rule();
@@ -187,11 +187,15 @@ void sphingid_syntax()
                     Parser::rule()->nonTerm(unary_exp)->cons("|=")->nonTerm(assignment),
                     Parser::rule()->nonTerm(unary_exp)->cons("^=")->nonTerm(assignment));
 
-
   exp->nonTerm(assignment);
   exp_stat->nonTerm(exp)->skip(";");
 
-  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat);
+  Parser* jump_stat = Parser::rule("<JUMP>")->oneOf(Parser::rule<JumpNode>("<RETRUN EXP>")->cons("return")->nonTerm(exp_stat),
+                                                    Parser::rule<JumpNode>("<RETURN>")->cons("return"),
+                                                    Parser::rule<JumpNode>()->cons("break"),
+                                                    Parser::rule<JumpNode>()->cons("continue"));
+
+  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat, jump_stat);
 
   selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat)->skip("else")->nonTerm(stat),
                         Parser::rule<SelectionNode>()->skip("if")->skip("(")->nonTerm(exp)->skip(")")->nonTerm(stat));
