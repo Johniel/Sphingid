@@ -107,7 +107,10 @@ void sphingid_syntax()
 
   keyword->skip(":")->id(reserved);
 
+  Parser* init_list = Parser::rule<InitListNode>("<INIT LIST>")->skip("#")->skip("{")->rep(Parser::rule<ExpNode>("<INIT LIST ELEM>")->nt(exp)->skip(","))->skip("}");
+
   primary_exp->oneOf(keyword,
+                     init_list,
                      Parser::rule()->id(),
                      Parser::rule()->num(),
                      Parser::rule()->str(),

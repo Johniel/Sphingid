@@ -543,7 +543,10 @@ namespace sphingid
     std::string InitListNode::str()
     {
       std::string s;
-      return "(" + s + ")";
+      for (size_t i = 0; i < this->v_.size(); ++i) {
+        s += v_[i]->str() + ", ";
+      }
+      return "#{" + s + "}";
     }
     bool InitListNode::isAssignable(void) { return false; }
     bool InitListNode::isConst(void) { return true; }
@@ -559,6 +562,9 @@ namespace sphingid
 
     InitListNode::InitListNode(std::vector<Node*> v)
     {
+      for (size_t i = 0; i < v.size(); ++i) {
+        this->v_.push_back((ExpNode*)v[i]);
+      }
     }
 
 //------------------------------------------------------------------------------

@@ -55,7 +55,9 @@ int main(int argc, string args)
   n = 10;
   n = n + 10;
   for (i = 0; i <= n; i = i + 1) {
-    i;
+    int j;
+    j = 10;
   }
+  #{1, 2, 3, f(4), 5,};
   return 42;
 }

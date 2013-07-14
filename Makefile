@@ -1,6 +1,6 @@
 CC = g++
 OUTDIR = ./target
-OPT = -std=c++0x
+OPT = -std=c++0x -g
 OBJS = ./target/parser.o ./target/lexer.o ./target/ast.o ./target/main.o
 
 all: $(OBJS)

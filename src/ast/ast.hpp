@@ -9,7 +9,7 @@
 #include "../parser/lexer.hpp"
 #include "../macro.hpp"
 
-#define TEST
+// #define TEST
 
 #ifdef TEST
 using namespace std;
@@ -29,9 +29,9 @@ namespace sphingid
       static Node* make(std::vector<Node*> v)
       {
 #ifdef TEST
-        std::cout << "Node::make" << std::endl;
+        cout << "Node::make" << std::endl;
         for (int i = 0; i < v.size(); ++i) {
-          std::cout << "Node> " << v[i]->str() << std::endl;
+          cout << "Node> " << v[i]->str() << std::endl;
         }
 #endif
         if (v.empty()) return (Node*)NULL;
@@ -53,10 +53,12 @@ namespace sphingid
       size_t size(void) { return array_.size(); }
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         cout << "ArrayNode::make" << endl;
         for (int i = 0; i < v.size(); ++i) {
           cout << v[i]->str() << endl;
         }
+#endif
         return new ArrayNode(v);
       }
       template<class T = Node>
@@ -167,7 +169,9 @@ namespace sphingid
       std::string str(void);
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         cout << "Keyword:make" << endl;
+#endif
         return new KeywordNode(v[0]->str());
       }
     private:
@@ -218,7 +222,7 @@ namespace sphingid
       FnDefNode(std::vector<Node*>) ;
       std::string name_;
       TermSymbolNode* ret_;
-      std::vector< pair<TermSymbolNode*, string> > args_;
+      std::vector< std::pair<TermSymbolNode*, std::string> > args_;
       RootNode* body_;
     };
 
@@ -383,10 +387,12 @@ namespace sphingid
       virtual std::string str();
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         cout << "ForNode" << endl;
         for (int i = 0; i < v.size(); ++i) {
           cout << i << " : " << v[i]->str() << endl;
         }
+#endif
         return new ForNode(v);
       }
     private:
@@ -409,10 +415,6 @@ namespace sphingid
       virtual int allocSize(void);
       static Node* make(std::vector<Node*> v)
       {
-        cout << "InitListNode" << endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << " : " << v[i]->str() << endl;
-        }
         return new InitListNode(v);
       }
     private:
@@ -432,10 +434,12 @@ namespace sphingid
       virtual int allocSize(void);
       static Node* make(std::vector<Node*> v)
       {
+#ifdef TEST
         cout << "AssignNode" << endl;
         for (int i = 0; i < v.size(); ++i) {
           cout << i << " : " << v[i]->str() << endl;
         }
+#endif
         return new AssignNode(v);
       }
     private:
@@ -443,6 +447,10 @@ namespace sphingid
       ExpNode* left_;
       ExpNode* right_;
     };
+
+
+//------------------------------------------------------------------------------
+
 
 
   }
