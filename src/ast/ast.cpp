@@ -462,7 +462,7 @@ namespace sphingid
     std::string JumpNode::str()
     {
       std::string s;
-      s += stat_;
+      s += stat_ + ":stat";
       s += " ";
       if (this->val_) s += this->val_->str();
       return "(" + s + ")";

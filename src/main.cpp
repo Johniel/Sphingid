@@ -196,13 +196,13 @@ void sphingid_syntax()
   exp_stat->nt(exp)->skip(";");
 
   Parser* jump_stat = Parser::rule("<JUMP>")->oneOf(Parser::rule<JumpNode>("<RETRUN EXP>")->cons("return")->nt(exp_stat),
-                                                    Parser::rule<JumpNode>("<RETURN>")->cons("return"),
-                                                    Parser::rule<JumpNode>()->cons("break"),
-                                                    Parser::rule<JumpNode>()->cons("continue"));
+                                                    Parser::rule<JumpNode>("<RETURN>")->cons("return")->skip(";"),
+                                                    Parser::rule<JumpNode>()->cons("break")->skip(";"),
+                                                    Parser::rule<JumpNode>()->cons("continue")->skip(";"));
 
   Parser* var_decl = Parser::rule<VarNode>()->id(reserved)->id(reserved)->skip(";");
 
-  Parser* stat = Parser::rule()->oneOf(compound_stat, selection_stat, iteration_stat, exp_stat, jump_stat, var_decl);
+  Parser* stat = Parser::rule()->oneOf(jump_stat, compound_stat, selection_stat, iteration_stat, exp_stat, var_decl);
 
   selection_stat->oneOf(Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat)->skip("else")->nt(stat),
                         Parser::rule<SelectionNode>()->skip("if")->skip("(")->nt(exp)->skip(")")->nt(stat));
