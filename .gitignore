@@ -14,3 +14,5 @@
 /.idea/c.y~
 /el/sphingid-mode.el~
 /tmp
+/src/interpreter/interpreter.cpp~
+/src/interpreter/interpreter.hpp~
