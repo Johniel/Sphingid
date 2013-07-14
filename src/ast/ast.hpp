@@ -397,6 +397,54 @@ namespace sphingid
       StatNode* body_;
     };
 
+//------------------------------------------------------------------------------
+
+    class InitListNode : public ExpNode {
+    public:
+      virtual ~InitListNode();
+      virtual std::string str();
+      virtual bool isAssignable(void);
+      virtual bool isConst(void);
+      virtual bool isLvalue(void);
+      virtual int allocSize(void);
+      static Node* make(std::vector<Node*> v)
+      {
+        cout << "InitListNode" << endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << " : " << v[i]->str() << endl;
+        }
+        return new InitListNode(v);
+      }
+    private:
+      InitListNode(std::vector<Node*>);
+      std::vector<ExpNode*> v_;
+    };
+
+//------------------------------------------------------------------------------
+
+    class AssignNode : public ExpNode {
+    public:
+      virtual ~AssignNode();
+      virtual std::string str();
+      virtual bool isAssignable(void);
+      virtual bool isConst(void);
+      virtual bool isLvalue(void);
+      virtual int allocSize(void);
+      static Node* make(std::vector<Node*> v)
+      {
+        cout << "AssignNode" << endl;
+        for (int i = 0; i < v.size(); ++i) {
+          cout << i << " : " << v[i]->str() << endl;
+        }
+        return new AssignNode(v);
+      }
+    private:
+      AssignNode(std::vector<Node*>);
+      ExpNode* left_;
+      ExpNode* right_;
+    };
+
+
   }
 }
 

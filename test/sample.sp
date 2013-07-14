@@ -50,6 +50,12 @@ int main(int argc, string args)
     4;
   }
   int n;
-  char c;  
+  int i;
+  char c;
+  n = 10;
+  n = n + 10;
+  for (i = 0; i <= n; i = i + 1) {
+    i;
+  }
   return 42;
 }

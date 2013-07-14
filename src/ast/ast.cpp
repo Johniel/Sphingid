@@ -510,7 +510,6 @@ namespace sphingid
       this->body_ = (StatNode*)v.back();
     }
 
-
 //------------------------------------------------------------------------------
 // class VarDeclNode
 //
@@ -532,6 +531,63 @@ namespace sphingid
       assert(v.size() <= 2);
       this->type_ = v[0]->str();
       this->name_ = v[1]->str();
+    }
+
+//------------------------------------------------------------------------------
+// class InitListNode
+//
+//------------------------------------------------------------------------------
+
+    InitListNode::~InitListNode() {}
+
+    std::string InitListNode::str()
+    {
+      std::string s;
+      return "(" + s + ")";
+    }
+    bool InitListNode::isAssignable(void) { return false; }
+    bool InitListNode::isConst(void) { return true; }
+    bool InitListNode::isLvalue(void) { return false; }
+    int InitListNode::allocSize(void)
+    {
+      int sum = 0;
+      each (i, v_) {
+        sum += (*i)->allocSize();
+      }
+      return sum;
+    }
+
+    InitListNode::InitListNode(std::vector<Node*> v)
+    {
+    }
+
+//------------------------------------------------------------------------------
+// class AssignNode
+//
+//------------------------------------------------------------------------------
+
+    AssignNode::~AssignNode() {}
+
+    std::string AssignNode::str()
+    {
+      std::string s;
+      s += this->left_->str();
+      s += " = ";
+      s += this->right_->str();
+      return "(" + s + ")";
+    }
+    bool AssignNode::isAssignable(void) { return true; }
+    bool AssignNode::isConst(void) { return true; }
+    bool AssignNode::isLvalue(void) { return true; }
+    int AssignNode::allocSize(void)
+    {
+      return this->left_->allocSize();
+    }
+
+    AssignNode::AssignNode(std::vector<Node*> v)
+    {
+      this->left_ = (ExpNode*)v[0];
+      this->right_ = (ExpNode*)v[1];
     }
 
   }

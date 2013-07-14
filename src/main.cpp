@@ -176,16 +176,18 @@ void sphingid_syntax()
   conditional->oneOf(Parser::rule()->nt(logical_or)->skip("?")->nt(exp)->skip(":")->nt(conditional),
                      logical_or);
 
-  assignment->oneOf(conditional,
-                    Parser::rule()->nt(unary_exp)->cons("=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("*=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("/=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("+=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("-=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("%=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("&=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("|=")->nt(assignment),
-                    Parser::rule()->nt(unary_exp)->cons("^=")->nt(assignment));
+  assignment->oneOf(Parser::rule<AssignNode>()->nt(unary_exp)->skip("=")->nt(assignment),
+                    /*
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("*=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("/=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("+=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("-=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("%=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("&=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("|=")->nt(assignment),
+                    Parser::rule<AssignNode>()->nt(unary_exp)->cons("^=")->nt(assignment),
+                    */
+                    conditional);
 
   exp->nt(assignment);
   exp_stat->nt(exp)->skip(";");
