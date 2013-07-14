@@ -16,3 +16,5 @@
 /tmp
 /src/interpreter/interpreter.cpp~
 /src/interpreter/interpreter.hpp~
+/src/interpreter/environment.cpp~
+/src/interpreter/environment.hpp~
