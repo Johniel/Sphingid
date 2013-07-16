@@ -4,10 +4,13 @@
 #include <vector>
 
 #include "./parser/parser.hpp"
+#include "./interpreter/environment.hpp"
+#include "./interpreter/interpreter.hpp"
 
-using namespace std;
-using namespace sphingid::parser;
 using namespace sphingid::ast;
+using namespace sphingid::interpreter;
+using namespace sphingid::parser;
+using namespace std;
 
 void arithmetic(void)
 {
@@ -116,8 +119,9 @@ void sphingid_syntax()
                      Parser::rule()->str(),
                      Parser::rule()->skip("(")->nt(exp)->skip(")"));
 
-  Parser* fn_call_arg = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->rep(Parser::rule()->nt(exp)->skip(","))->nt(exp),
-                                              Parser::rule<ArrayNode>()->nt(exp));
+  Parser* fn_call_arg = Parser::rule()->oneOf(Parser::rule<ArrayNode>()->nt(exp),
+                                              Parser::rule<ArrayNode>()->rep(Parser::rule()->nt(exp)->skip(","))->nt(exp));
+
 
   postfix_exp->oneOf(Parser::rule<FnCallNode>()->id()->skip("(")->skip(")"),
                      Parser::rule<FnCallNode>()->id()->skip("(")->nt(fn_call_arg)->skip(")"),
@@ -244,7 +248,12 @@ void sphingid_syntax()
   Lexer* lexer = new Lexer();
   Node* root = program->parse(lexer);
   cout << "$" << endl;
-  if (root) cout << root->str() << endl;
+  if (root) {
+    cout << root->str() << endl;
+    Eval* eval = new Eval();
+    eval->run(root);
+    // cout << eval->run(root)->str() << endl;
+  }
 
   return ;
 }

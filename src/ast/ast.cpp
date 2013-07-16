@@ -34,6 +34,19 @@ namespace sphingid
       return "(" + s + ")";
     }
 
+    Node* RootNode::eval(Visitor* vis)
+    {
+#ifdef TEST
+      cout << "RootNode::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+      Node* result = NULL;
+      for (size_t i = 0; i < next_.size(); ++i) {
+        result = next_[i]->eval(vis);
+      }
+      return result;
+    }
+
 //------------------------------------------------------------------------------
 // class ExpNode
 //
@@ -94,6 +107,16 @@ namespace sphingid
       return "(" + std::string(buff) + ")";
     }
 
+    Node* NumLiteralNode::eval(Visitor* eval)
+    {
+#ifdef TEST
+      cout << "Num::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+      return this;
+    }
+
+
 //------------------------------------------------------------------------------
 // class StrLiteralNode
 //
@@ -144,6 +167,17 @@ namespace sphingid
     {
       return "(" + left_->str() + " " + op_ + " " + right_->str() + ")";
     }
+
+    Node* BinaryOpNode::eval(Visitor* eval)
+    {
+#ifdef TEST
+      cout << "BinaryOpNode::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+      assert(false);
+      return NULL;
+    }
+
 
 
 //------------------------------------------------------------------------------
@@ -261,6 +295,16 @@ namespace sphingid
       return "(" + s + ")";
     }
 
+    Node* FnDefNode::eval(Visitor* eval)
+    {
+#ifdef TEST
+      cout << "FnDefNode::eval" << endl;
+      cout << this->str() << endl;
+#endif
+      eval->visit(this);
+      return NULL;
+    }
+
 //------------------------------------------------------------------------------
 // class ClassNode
 //
@@ -348,20 +392,25 @@ namespace sphingid
 //
 //------------------------------------------------------------------------------
 
+    FnCallNode::FnCallNode() { assert(false); }
 
-    FnCallNode::FnCallNode()
-    {
-      assert(false);
-    }
-
-    FnCallNode::~FnCallNode()
-    {
-    }
+    FnCallNode::~FnCallNode() {}
 
     bool FnCallNode::isAssignable(void) { return false; }
     bool FnCallNode::isConst(void) { return true; }
     bool FnCallNode::isLvalue(void) { return false; }
     int FnCallNode::allocSize(void) { return 0; }
+
+    Node* FnCallNode::eval(Visitor* env)
+    {
+#ifdef TEST
+      cout << "FnCallNode::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+
+      FnDefNode* fn = (FnDefNode*)env->getFnScope(this->name_);
+      return fn->eval(env);
+    }
 
     std::string FnCallNode::str()
     {
@@ -412,6 +461,22 @@ namespace sphingid
       return "(" + s + ")";
     }
 
+    Node* SelectionNode::eval(Visitor* eval)
+    {
+#ifdef TEST
+      cout << "SelectionNode::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+
+      Node* cond = this->cond_->eval(eval);
+      if (cond->str() == "1") {
+        this->then_->eval(eval);
+      } else if (this->else_) {
+        this->then_->eval(eval);
+      }
+      return NULL;
+    }
+
     SelectionNode::SelectionNode(std::vector<Node*> v)
     {
       assert(2 <= v.size());
@@ -458,6 +523,16 @@ namespace sphingid
 //------------------------------------------------------------------------------
 
     JumpNode::~JumpNode() {}
+
+    Node* JumpNode::eval(Visitor* eval)
+    {
+#ifdef TEST
+      cout << "JumpNode::eval:" << endl;
+      cout << this->str() << endl;
+#endif
+      assert(false);
+      return NULL;
+    }
 
     std::string JumpNode::str()
     {

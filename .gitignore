@@ -18,3 +18,6 @@
 /src/interpreter/interpreter.hpp~
 /src/interpreter/environment.cpp~
 /src/interpreter/environment.hpp~
+/target/environment.o
+/target/interpreter.o
+/test/fib.sp~

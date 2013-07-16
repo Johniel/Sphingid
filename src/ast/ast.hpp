@@ -9,7 +9,7 @@
 #include "../parser/lexer.hpp"
 #include "../macro.hpp"
 
-// #define TEST
+#define TEST
 
 #ifdef TEST
 using namespace std;
@@ -19,6 +19,8 @@ namespace sphingid
 {
   namespace ast
   {
+    class Visitor;
+
 //------------------------------------------------------------------------------
     class Node
     {
@@ -26,6 +28,13 @@ namespace sphingid
       Node() {}
       virtual ~Node() {}
       virtual std::string str(void) = 0;
+      virtual Node* eval(Visitor*) {
+#ifdef TEST
+        cout << "Node::eval:" << endl;
+        cout << this->str() << endl;
+#endif
+        return this;
+      }
       static Node* make(std::vector<Node*> v)
       {
 #ifdef TEST
@@ -81,6 +90,7 @@ namespace sphingid
       RootNode(std::vector<Node*>);
       virtual ~RootNode();
       std::string str(void);
+      virtual Node* eval(Visitor*);
       static Node* make(std::vector<Node*> v)
       {
         return new RootNode(v);
@@ -108,6 +118,7 @@ namespace sphingid
       virtual ~BinaryOpNode();
       int allocSize(void);
       std::string str(void);
+      virtual Node* eval(Visitor*);
       static Node* make(std::vector<Node*> v)
       {
 #ifdef TEST
@@ -137,6 +148,7 @@ namespace sphingid
       bool isLvalue(void);
       int allocSize(void);
       std::string str(void);
+      virtual Node* eval(Visitor*);
     private:
       int num_;
     };
@@ -207,6 +219,7 @@ namespace sphingid
     public:
       ~FnDefNode() ;
       virtual std::string str() ;
+      virtual Node* eval(Visitor*);
       static Node* make(std::vector<Node*> v)
       {
 #ifdef TEST
@@ -313,6 +326,7 @@ namespace sphingid
     public:
       FnCallNode();
       virtual ~FnCallNode();
+      virtual Node* eval(Visitor*);
       virtual std::string str();
       virtual bool isAssignable(void);
       virtual bool isConst(void);
@@ -334,6 +348,7 @@ namespace sphingid
     public:
       virtual ~SelectionNode();
       virtual std::string str();
+      virtual Node* eval(Visitor*);
       static Node* make(std::vector<Node*> v)
       {
         return new SelectionNode(v);
@@ -368,6 +383,7 @@ namespace sphingid
     public:
       virtual ~JumpNode();
       virtual std::string str();
+      virtual Node* eval(Visitor*);
       static Node* make(std::vector<Node*> v)
       {
         return new JumpNode(v);
@@ -448,11 +464,39 @@ namespace sphingid
       ExpNode* right_;
     };
 
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 
-
-
+    class Visitor {
+    public:
+      Visitor() { }
+      virtual ~Visitor() { }
+      virtual Node* visit(Node*) = 0;
+      virtual Node* visit(ArrayNode*) = 0;
+      virtual Node* visit(RootNode*) = 0;
+      virtual Node* visit(ExpNode*) = 0;
+      virtual Node* visit(BinaryOpNode*) = 0;
+      virtual Node* visit(NumLiteralNode*) = 0;
+      virtual Node* visit(StrLiteralNode*) = 0;
+      virtual Node* visit(KeywordNode*) = 0;
+      virtual Node* visit(TermSymbolNode*) = 0;
+      virtual Node* visit(StatNode*) = 0;
+      virtual Node* visit(FnDefNode*) = 0;
+      virtual Node* visit(FnDeclNode*) = 0;
+      virtual Node* visit(ClassNode*) = 0;
+      virtual Node* visit(VarNode*) = 0;
+      virtual Node* visit(StructNode*) = 0;
+      virtual Node* visit(FnCallNode*) = 0;
+      virtual Node* visit(SelectionNode*) = 0;
+      virtual Node* visit(WhileNode*) = 0;
+      virtual Node* visit(JumpNode*) = 0;
+      virtual Node* visit(ForNode*) = 0;
+      virtual Node* visit(InitListNode*) = 0;
+      virtual Node* visit(AssignNode*) = 0;
+      void addFnScope(ast::Node*);
+      Node* getFnScope(std::string);
+    };
   }
 }
 
