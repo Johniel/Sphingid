@@ -91,7 +91,7 @@ namespace sphingid
     {
       char buff[20];
       sprintf(buff, "%d", num_);
-      return "(" + std::string(buff) + ")";
+      return std::string(buff);
     }
 
 //------------------------------------------------------------------------------

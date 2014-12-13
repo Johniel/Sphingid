@@ -131,10 +131,11 @@ namespace sphingid
     {
       while ((int)tokens_.size() <= i) {
         if (!readNextLine()) {
-          if (EOF_ == (Token*)NULL) EOF_ = new Sentinel(line_count_, "<EOF>\n");
+          if (EOF_ == (Token*)NULL) EOF_ = new Sentinel(line_count_, "<EOF>");
           return EOF_;
         }
       }
+      // std::cout << "peek: " << tokens_[i]->str() << std::endl;
       return tokens_[i];
     }
 
@@ -156,26 +157,15 @@ namespace sphingid
 
     void Lexer::initRegexp(void)
     {
-      identifier =
-        (as_xpr("_") | range('a', 'z') | range('A', 'Z')) >>
-        *(as_xpr("_") | range('a', 'z') | range('A', 'Z') | range('0', '9'));
+      const std::string numlit_regex = "[[:digit:]]+";
+      const std::string strlit_regex = "\"(\\\n|\\\"|\\\'|.)*\"";
+      const std::string id_regex = "[a-zA-Z_][_a-zA-Z0-9_]*";
+      const std::string tokenize_regex = strlit_regex + "|" + numlit_regex + "|" + id_regex + "|" + "[[:punct:]]";
 
-      op = as_xpr("==") | "<=" | ">=" | "&&" | "||";
-
-      strlit = '\"' >> *(as_xpr("\\\"") | "\\n" | "\\\\" |
-                         ~(boost::xpressive::set= '\"', '\'')) >> '\"';
-
-      numlit = *range('0', '9');
-
-      mark_tag identifier_tag(1), op_tag(2), str_tag(3), num_tag(4), punc_tag(5);
-      reg =
-        *_s >>
-        !(("//" >> *_) |
-          (identifier_tag= by_ref(identifier)) |
-          (op_tag= by_ref(op)) |
-          (str_tag= by_ref(strlit)) |
-          (num_tag= by_ref(numlit)) |
-          (punc_tag= punct));
+      numlit_     = std::regex(numlit_regex);
+      strlit_     = std::regex(strlit_regex);
+      identifier_ = std::regex(id_regex);
+      tokenize_   = std::regex(tokenize_regex);
 
       return ;
     }
@@ -184,30 +174,22 @@ namespace sphingid
     {
       if (std::cin.eof()) return false;
 
-      std::string str;
-      std::getline(std::cin, str);
+      std::string line;
+      std::getline(std::cin, line);
 
-      mark_tag identifier_tag(1), op_tag(2), str_tag(3), num_tag(4), punc_tag(5);
+      std::sregex_iterator first(line.begin(), line.end(), tokenize_), end;
 
-      sregex_iterator itr(str.begin(), str.end(), reg);
-      sregex_iterator end;
-      for(std::string s; itr != end; ++itr) {
-
-        s = (*itr)[identifier_tag].str();
-        if (s.size()) tokens_.push_back(new Identifier(line_count_, s));
-
-        s = (*itr)[op_tag].str();
-        if (s.size()) tokens_.push_back(new Identifier(line_count_, s));
-
-        s = (*itr)[str_tag].str();
-        if (s.size()) tokens_.push_back(new String(line_count_, s));
-
-        s = (*itr)[num_tag].str();
-        if (s.size()) tokens_.push_back(new Number(line_count_, s));
-
-        s = (*itr)[punc_tag].str();
-        if (s.size()) tokens_.push_back(new Identifier(line_count_, s));
-
+      for (std::sregex_iterator itr = first; itr != end; ++itr) {
+        std::string s = itr->str();
+        if (std::regex_match(s, numlit_)) {
+          tokens_.push_back(new Number(line_count_, s));
+        } else if (std::regex_match(s, strlit_)) {
+          tokens_.push_back(new String(line_count_, s));
+        } else if (std::regex_match(s, identifier_)) {
+          tokens_.push_back(new Identifier(line_count_, s));
+        } else {
+          tokens_.push_back(new Identifier(line_count_, s));
+        }
       }
 
       ++line_count_;

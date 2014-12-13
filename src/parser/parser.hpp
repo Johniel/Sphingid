@@ -3,10 +3,18 @@
 
 #include <string>
 #include <vector>
+#include <cassert>
+#include <iostream>
+#include <map>
+#include <set>
 
 #include "../ast/ast.hpp"
 #include "../macro.hpp"
 #include "./lexer.hpp"
+
+namespace {
+
+};
 
 namespace sphingid
 {
@@ -24,9 +32,7 @@ namespace sphingid
 
       template<class T = ast::Node>
       static Parser* rule(std::string name = "{anonymous}")
-      // static Parser* rule()
       {
-        // return new Parser(T::make, name);
         Parser* parser = new Parser(T::make);
         parser->name_ = name;
         return parser;
@@ -46,12 +52,13 @@ namespace sphingid
       Parser* rep(Parser*);
       Parser* opt(Parser*);
       Parser* nt(Parser*);
-      Parser* num(void);
-      Parser* str(void);
-      Parser* id(std::set<std::string> reserved = std::set<std::string>());
       Parser* opR(Parser*, Parser*, Parser*);
       Parser* opL(Parser*, Parser*, Parser*);
       // Parser* id(std::set<std::string>);
+      Parser* id(std::set<std::string> reserved = std::set<std::string>());
+      Parser* num(void);
+      Parser* str(void);
+      std::string getName(void) { return name_; }
     private:
       Parser(MakeNodeFunc);
       // Parser(MakeNodeFunc, std::string);

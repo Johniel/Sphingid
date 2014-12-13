@@ -12,7 +12,7 @@ namespace sphingid
     class Rule
     {
     public:
-      Rule() : next_(NULL) {}
+      Rule() {}
 
       virtual ~Rule() {}
 
@@ -25,8 +25,11 @@ namespace sphingid
 
       virtual void parse(Lexer*, std::vector<ast::Node*>&) = 0;
 
-    private:
-      Rule* next_;
+    protected:
+      void err(std::string msg)
+      {
+        std::cerr << msg << std::endl;
+      }
     };
 
 //------------------------------------------------------------------------------
@@ -67,7 +70,7 @@ namespace sphingid
     class Or : public Rule {
     public:
       Or(Parser* p0,
-         Parser* p1,
+         Parser* p1 = NULL,
          Parser* p2 = NULL,
          Parser* p3 = NULL,
          Parser* p4 = NULL,
@@ -215,7 +218,7 @@ namespace sphingid
 
       int match(Lexer* lexer, int nth)
       {
-        if (ignores_.count(lexer->peek(nth)->str())) return false;
+        if (ignores_.count(lexer->peek(nth)->str())) return 0;
         return lexer->peek(nth)->isIdToken();
       }
 
@@ -291,11 +294,14 @@ namespace sphingid
       virtual ~Cons() {}
       int match(Lexer* lexer, int nth)
       {
-        const Token* t = lexer->peek(nth);
-        if (t->isIdToken() && t->str() == s_) {
-          return 1;
+        std::string s;
+        int i = 0;
+        while (lexer->peek(nth + i)->isIdToken() && s.size() < s_.size()) {
+          s += lexer->peek(nth + i)->str();
+          ++i;
         }
-        return 0;
+        // std::cerr << s << ' ' << s_ << ' ' << i << std::endl;
+        return (s == s_) * i;
       }
       virtual void parse(Lexer* lexer, std::vector<ast::Node*>& result)
       {
@@ -372,7 +378,6 @@ namespace sphingid
     Parser::Parser() {}
 
     Parser::Parser(MakeNodeFunc f) : makeNodeFunc_(f) {}
-    // Parser::Parser(MakeNodeFunc f, std::string name) : makeNodeFunc_(f), name_(name) {}
 
     Parser::~Parser()
     {
@@ -398,16 +403,14 @@ namespace sphingid
       each (i, rs_) {
         int m = (*i)->match(lexer, curr);
         if (m == 0) {
-#ifdef TEST
-          std::cout << "[" << this->name_ << "] Fail: " << lexer->peek(nth)->str() << std::endl;
-#endif
-          return memo_[(Token*)front] = 0;
+          const sphingid::parser::Token* mismatched = lexer->peek(curr);
+          std::cerr << "[parse errer] line:" << mismatched->line() << " " << mismatched->str() << " is not " << name_ << std::endl;
+          curr = nth;
+          break;
         }
         curr += m;
       }
-#ifdef TEST
-      std::cout << "[" << this->name_ << "] Succes: " << lexer->peek(nth)->str() << std::endl;
-#endif
+
       return memo_[(Token*)front] = curr - nth;
     }
 
@@ -415,14 +418,6 @@ namespace sphingid
     {
       std::vector<ast::Node*> result;
       each (i, rs_) (*i)->parse(lexer, result);
-
-#ifdef TEST
-      cout << rs_.size() << endl;
-      for (int i = 0; i < result.size(); ++i) {
-        cout << result[i]->str() << endl;
-      }
-#endif
-
       return (makeNodeFunc_)(result);
     }
 
@@ -450,7 +445,6 @@ namespace sphingid
     Parser* Parser::opt(Parser* p)
     {
       assert(false);
-      // rs_.push_back(new Option(p));
       return this;
     }
 
@@ -466,6 +460,28 @@ namespace sphingid
       return this;
     }
 
+    Parser* Parser::opR(Parser* l, Parser* op, Parser* r)
+    {
+      Parser* rest = rule<ast::ArrayNode>("<BINARY OP LEFT VALUE>")->nt(op)->nt(r);
+      Parser* parser = rule<BinaryOpNodeR>("<BINARY OP R>")->nt(l)->rep(rest);
+      this->nt(parser);
+      return this;
+    }
+
+    Parser* Parser::opL(Parser* l, Parser* op, Parser* r)
+    {
+      Parser* rest = rule<ast::ArrayNode>("<BINARY OP LEFT VALUE>")->nt(op)->nt(r);
+      Parser* parser = rule<BinaryOpNodeL>("<BINARY OP L>")->nt(l)->rep(rest);
+      this->nt(parser);
+      return this;
+    }
+
+    Parser* Parser::id(std::set<std::string> reserved)
+    {
+      rs_.push_back(new IdToken(reserved));
+      return this;
+    }
+
     Parser* Parser::num(void)
     {
       rs_.push_back(new NumToken());
@@ -478,27 +494,5 @@ namespace sphingid
       return this;
     }
 
-    // Parser* Parser::id(std::set<std::string> reserved = std::set<std::string>())
-    Parser* Parser::id(std::set<std::string> reserved)
-    {
-      rs_.push_back(new IdToken(reserved));
-      return this;
-    }
-
-    Parser* Parser::opR(Parser* l, Parser* op, Parser* r)
-    {
-      Parser* rest = rule<ast::ArrayNode>()->nt(op)->nt(r);
-      Parser* parser = rule<BinaryOpNodeR>()->nt(l)->rep(rest);
-      this->nt(parser);
-      return this;
-    }
-
-    Parser* Parser::opL(Parser* l, Parser* op, Parser* r)
-    {
-      Parser* rest = rule<ast::ArrayNode>()->nt(op)->nt(r);
-      Parser* parser = rule<BinaryOpNodeL>()->nt(l)->rep(rest);
-      this->nt(parser);
-      return this;
-    }
   }
 }

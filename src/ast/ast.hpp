@@ -5,15 +5,10 @@
 #include <vector>
 
 #include <cstdio>
+#include <cassert>
 
 #include "../parser/lexer.hpp"
 #include "../macro.hpp"
-
-// #define TEST
-
-#ifdef TEST
-using namespace std;
-#endif
 
 namespace sphingid
 {
@@ -28,17 +23,10 @@ namespace sphingid
       virtual std::string str(void) = 0;
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "Node::make" << std::endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << "Node> " << v[i]->str() << std::endl;
-        }
-#endif
         if (v.empty()) return (Node*)NULL;
         return v[0];
       }
     };
-
 
 //------------------------------------------------------------------------------
     class ArrayNode : public Node
@@ -53,12 +41,6 @@ namespace sphingid
       size_t size(void) { return array_.size(); }
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "ArrayNode::make" << endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << v[i]->str() << endl;
-        }
-#endif
         return new ArrayNode(v);
       }
       template<class T = Node>
@@ -110,12 +92,6 @@ namespace sphingid
       std::string str(void);
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        std::cout << "BinaryOpNode::make" << std::endl;
-        for (int i = 0; i < v.size(); ++i) {
-          std::cout << "BinaryOpNode>" << v[i]->str() << std::endl;
-        }
-#endif
         if (v.size() == 2) return new BinaryOpNode(v[1]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
         if (v.size() == 3) return new BinaryOpNode(v[0]->str(), (ExpNode*)v[0], (ExpNode*)v[2]);
         assert(false && "Binary Oporator");
@@ -169,9 +145,6 @@ namespace sphingid
       std::string str(void);
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "Keyword:make" << endl;
-#endif
         return new KeywordNode(v[0]->str());
       }
     private:
@@ -186,12 +159,6 @@ namespace sphingid
       std::string str(void);
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "TermSymbolNode::make" << endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << ": " << v[i]->str() << endl;
-        }
-#endif
         assert(v.size() == 1);
         return new TermSymbolNode(v[0]->str());
       }
@@ -209,12 +176,6 @@ namespace sphingid
       virtual std::string str() ;
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        std::cout << "FnDefNode::make" << std::endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << ": " << v[i]->str() << endl;
-        }
-#endif
         assert(v.size() == 4); // return_type, fn_name, arg_list, body
         return new FnDefNode(v);
       }
@@ -233,9 +194,6 @@ namespace sphingid
       virtual std::string str() ;
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        std::cout << "FnDeclNode" << std::endl;
-#endif
         return new FnDeclNode(v);
       }
     private:
@@ -253,12 +211,6 @@ namespace sphingid
       virtual std::string str() ;
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        std::cout << "ClassNode:make" << std::endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << ": " << v[i]->str() << endl;
-        }
-#endif
         return new ClassNode(v);
       }
     private:
@@ -292,12 +244,6 @@ namespace sphingid
       virtual std::string str() ;
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        std::cout << "StructNode:make" << std::endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << ": " << v[i]->str() << endl;
-        }
-#endif
         return new StructNode(v);
       }
     private:
@@ -387,12 +333,6 @@ namespace sphingid
       virtual std::string str();
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "ForNode" << endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << " : " << v[i]->str() << endl;
-        }
-#endif
         return new ForNode(v);
       }
     private:
@@ -434,12 +374,6 @@ namespace sphingid
       virtual int allocSize(void);
       static Node* make(std::vector<Node*> v)
       {
-#ifdef TEST
-        cout << "AssignNode" << endl;
-        for (int i = 0; i < v.size(); ++i) {
-          cout << i << " : " << v[i]->str() << endl;
-        }
-#endif
         return new AssignNode(v);
       }
     private:

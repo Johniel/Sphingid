@@ -3,9 +3,11 @@
 
 #include <string>
 #include <vector>
-
-#include <boost/xpressive/xpressive.hpp>
-using namespace boost::xpressive;
+#include <regex>
+#include <cassert>
+#include <iostream>
+#include <map>
+#include <set>
 
 #include "../ast/ast.hpp"
 
@@ -91,11 +93,11 @@ namespace sphingid
       bool readNextLine(void);
       void initRegexp(void);
 
-      sregex reg;
-      sregex numlit;
-      sregex strlit;
-      sregex identifier;
-      sregex op;
+      std::regex tokenize_;
+      std::regex numlit_;
+      std::regex strlit_;
+      std::regex identifier_;
+      std::regex op_;
 
       int line_count_;
       std::vector<Token*> tokens_;
